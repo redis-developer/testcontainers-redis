@@ -27,7 +27,7 @@ public class RedisContainer extends GenericContainer<RedisContainer> {
 
     public static final int REDIS_PORT = 6379;
 
-    private boolean cluster;
+    protected boolean cluster;
 
     public RedisContainer() {
         this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));

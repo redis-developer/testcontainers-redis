@@ -1,5 +1,8 @@
 package com.redislabs.testcontainers;
 
+import com.redislabs.mesclun.RedisModulesAsyncCommands;
+import com.redislabs.mesclun.RedisModulesCommands;
+import com.redislabs.mesclun.RedisModulesReactiveCommands;
 import io.lettuce.core.api.async.BaseRedisAsyncCommands;
 import io.lettuce.core.api.reactive.BaseRedisReactiveCommands;
 import io.lettuce.core.api.sync.BaseRedisCommands;
@@ -18,36 +21,30 @@ public class BaseRedisModulesTest {
     @Container
     protected static final RedisModulesContainer REDIS = new RedisModulesContainer();
 
-    @Container
-    protected static final RedisModulesContainer REDIS_CLUSTER = new RedisModulesContainer().withClusterMode();
-
     @BeforeAll
     static void isRunning() {
         Assertions.assertTrue(REDIS.isRunning());
-        Assertions.assertTrue(REDIS_CLUSTER.isRunning());
     }
 
     @AfterEach
     public void cleanupEach() {
         RedisServerCommands<String, String> redisCommands = REDIS.sync();
         redisCommands.flushall();
-        RedisServerCommands<String, String> redisClusterCommands = REDIS_CLUSTER.sync();
-        redisClusterCommands.flushall();
     }
 
-    static Stream<RedisContainer> containers() {
-        return Stream.of(REDIS, REDIS_CLUSTER);
+    static Stream<RedisModulesContainer> containers() {
+        return Stream.of(REDIS);
     }
 
-    static Stream<BaseRedisCommands<String, String>> sync() {
+    static Stream<RedisModulesCommands<String, String>> sync() {
         return containers().map(RedisContainer::sync);
     }
 
-    static Stream<BaseRedisAsyncCommands<String, String>> async() {
+    static Stream<RedisModulesAsyncCommands<String, String>> async() {
         return containers().map(RedisContainer::async);
     }
 
-    static Stream<BaseRedisReactiveCommands<String, String>> reactive() {
+    static Stream<RedisModulesReactiveCommands<String, String>> reactive() {
         return containers().map(RedisContainer::reactive);
     }
 
