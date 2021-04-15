@@ -33,11 +33,15 @@ public class RedisContainer extends GenericContainer<RedisContainer> {
         this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
     }
 
-    public RedisContainer(final DockerImageName dockerImageName) {
+    protected RedisContainer(final DockerImageName dockerImageName) {
         super(dockerImageName);
-        dockerImageName.assertCompatibleWith(DEFAULT_IMAGE_NAME);
+        dockerImageName.assertCompatibleWith(defaultImageName());
         withExposedPorts(REDIS_PORT);
         waitingFor(Wait.forLogMessage(".*Ready to accept connections.*\\n", 1));
+    }
+
+    protected DockerImageName defaultImageName() {
+        return DEFAULT_IMAGE_NAME;
     }
 
     /**
@@ -45,13 +49,13 @@ public class RedisContainer extends GenericContainer<RedisContainer> {
      *
      * @return a Redis Cluster container
      */
-    public RedisContainer withClusterMode() {
+    public <C extends RedisContainer> C withClusterMode() {
         withCopyFileToContainer(MountableFile.forClasspathResource("redis-cluster.conf"), "/data/redis.conf");
         withCopyFileToContainer(MountableFile.forClasspathResource("nodes-cluster.conf"), "/data/nodes.conf");
         withCommand("redis-server", "/data/redis.conf");
         waitingFor(Wait.forLogMessage(".*Cluster state changed: ok*\\n", 1));
         cluster = true;
-        return this;
+        return (C) this;
     }
 
     /**
@@ -69,11 +73,9 @@ public class RedisContainer extends GenericContainer<RedisContainer> {
 
     public Supplier<StatefulConnection<String, String>> connectionSupplier() {
         if (cluster) {
-            RedisClusterClient client = RedisClusterClient.create(redisUri());
-            return () -> client.connect();
+            return RedisClusterClient.create(redisUri())::connect;
         }
-        RedisClient client = RedisClient.create(redisUri());
-        return () -> client.connect();
+        return RedisClient.create(redisUri())::connect;
     }
 
     @SuppressWarnings("unchecked")
