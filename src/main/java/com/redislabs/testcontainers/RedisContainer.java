@@ -35,6 +35,7 @@ public class RedisContainer extends GenericContainer<RedisContainer> {
         return DEFAULT_IMAGE_NAME;
     }
 
+    @SuppressWarnings("unchecked")
     public <C extends RedisContainer> C withKeyspaceNotifications() {
         withCopyFileToContainer(MountableFile.forClasspathResource("redis-keyspace-notifications.conf"), "/data/redis.conf");
         withCommand("redis-server", "/data/redis.conf");
@@ -48,12 +49,14 @@ public class RedisContainer extends GenericContainer<RedisContainer> {
     /**
      * Enables Redis cluster mode
      *
+     * @param <C> this RedisContainer instance
      * @return a Redis Cluster container
      */
     public <C extends RedisContainer> C withClusterMode() {
         return withClusterMode("redis-cluster.conf");
     }
 
+    @SuppressWarnings("unchecked")
     private <C extends RedisContainer> C withClusterMode(String conf) {
         withCopyFileToContainer(MountableFile.forClasspathResource(conf), "/data/redis-cluster.conf");
         withCopyFileToContainer(MountableFile.forClasspathResource("nodes-cluster.conf"), "/data/nodes.conf");

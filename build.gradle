@@ -32,6 +32,7 @@ dependencies {
     api group: 'org.testcontainers', name: 'testcontainers', version: testcontainers_version
     api group: 'org.testcontainers', name: 'junit-jupiter', version: testcontainers_version
     testImplementation 'com.redislabs:mesclun:1.2.2'
+    testImplementation 'org.slf4j:slf4j-jdk14:1.7.30'
 }
 
 test {

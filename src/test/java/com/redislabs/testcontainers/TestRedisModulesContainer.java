@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@SuppressWarnings("unchecked")
 @Testcontainers
 public class TestRedisModulesContainer extends BaseRedisModulesTest {
 
