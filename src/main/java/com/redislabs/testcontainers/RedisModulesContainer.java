@@ -1,10 +1,6 @@
 package com.redislabs.testcontainers;
 
-import com.redislabs.mesclun.RedisModulesClient;
-import io.lettuce.core.api.StatefulConnection;
 import org.testcontainers.utility.DockerImageName;
-
-import java.util.function.Supplier;
 
 public class RedisModulesContainer extends RedisContainer {
 
@@ -25,10 +21,17 @@ public class RedisModulesContainer extends RedisContainer {
     }
 
     @Override
-    public Supplier<StatefulConnection<String, String>> connectionSupplier() {
-        if (cluster) {
-            throw new UnsupportedOperationException("Redis Modules container does not support cluster mode");
-        }
-        return RedisModulesClient.create(redisUri())::connect;
+    public <C extends RedisContainer> C withKeyspaceNotifications() {
+        throw new UnsupportedOperationException("RedisModulesContainer does not support keyspace notifications");
+    }
+
+    @Override
+    public <C extends RedisContainer> C withClusterKeyspaceNotifications() {
+        throw new UnsupportedOperationException("RedisModulesContainer does not support keyspace notifications");
+    }
+
+    @Override
+    public <C extends RedisContainer> C withClusterMode() {
+        throw new UnsupportedOperationException("RedisModulesContainer does not support cluster mode");
     }
 }

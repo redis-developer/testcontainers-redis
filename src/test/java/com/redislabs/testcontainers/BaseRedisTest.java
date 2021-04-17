@@ -1,9 +1,8 @@
 package com.redislabs.testcontainers;
 
-import io.lettuce.core.api.async.BaseRedisAsyncCommands;
-import io.lettuce.core.api.reactive.BaseRedisReactiveCommands;
-import io.lettuce.core.api.sync.BaseRedisCommands;
+import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.sync.RedisServerCommands;
+import io.lettuce.core.cluster.RedisClusterClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,28 +26,25 @@ public class BaseRedisTest {
         Assertions.assertTrue(REDIS_CLUSTER.isRunning());
     }
 
-    @AfterEach
-    public void cleanupEach() {
-        RedisServerCommands<String, String> redisCommands = REDIS.sync();
-        redisCommands.flushall();
-        RedisServerCommands<String, String> redisClusterCommands = REDIS_CLUSTER.sync();
-        redisClusterCommands.flushall();
-    }
-
     static Stream<RedisContainer> containers() {
         return Stream.of(REDIS, REDIS_CLUSTER);
     }
 
-    static Stream<BaseRedisCommands<String, String>> sync() {
-        return containers().map(RedisContainer::sync);
+    @AfterEach
+    public void cleanupEach() {
+        RedisServerCommands<String, String> sync = sync(REDIS);
+        sync.flushall();
+        sync = sync(REDIS_CLUSTER);
+        sync.flushall();
     }
 
-    static Stream<BaseRedisAsyncCommands<String, String>> async() {
-        return containers().map(RedisContainer::async);
-    }
 
-    static Stream<BaseRedisReactiveCommands<String, String>> reactive() {
-        return containers().map(RedisContainer::reactive);
+    @SuppressWarnings("unchecked")
+    protected <T> T sync(RedisContainer redisContainer) {
+        if (redisContainer.isCluster()) {
+            return (T) RedisClusterClient.create(redisContainer.getRedisUri()).connect().sync();
+        }
+        return (T) RedisClient.create(redisContainer.getRedisUri()).connect().sync();
     }
 
 }
