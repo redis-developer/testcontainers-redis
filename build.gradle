@@ -32,7 +32,9 @@ dependencies {
     api group: 'org.testcontainers', name: 'testcontainers', version: testcontainers_version
     api group: 'org.testcontainers', name: 'junit-jupiter', version: testcontainers_version
     testImplementation 'com.redislabs:mesclun:1.2.2'
-    testImplementation 'org.slf4j:slf4j-jdk14:1.7.30'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.30'
+    testImplementation group: 'org.projectlombok', name: 'lombok', version: lombok_version
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombok_version
 }
 
 test {

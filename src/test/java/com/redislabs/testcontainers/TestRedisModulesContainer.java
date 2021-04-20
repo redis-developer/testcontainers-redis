@@ -1,39 +1,67 @@
 package com.redislabs.testcontainers;
 
-import com.redislabs.mesclun.gears.RedisGearsCommands;
+import com.redislabs.mesclun.RedisModulesClient;
+import com.redislabs.mesclun.StatefulRedisModulesConnection;
 import com.redislabs.mesclun.gears.output.ExecutionResults;
 import com.redislabs.mesclun.timeseries.CreateOptions;
 import com.redislabs.mesclun.timeseries.Label;
 import com.redislabs.mesclun.timeseries.RedisTimeSeriesCommands;
-import io.lettuce.core.api.sync.BaseRedisCommands;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.*;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("unchecked")
 @Testcontainers
-public class TestRedisModulesContainer extends BaseRedisModulesTest {
+public class TestRedisModulesContainer {
 
-    @ParameterizedTest(name = "can ping {0}")
-    @MethodSource("containers")
-    void canPing(RedisModulesContainer redisContainer) {
-        BaseRedisCommands<String, String> commands = sync(redisContainer);
-        Assertions.assertEquals("PONG", commands.ping());
+
+    @Container
+    protected static final RedisModulesContainer REDIS = new RedisModulesContainer();
+    private RedisModulesClient client;
+    private StatefulRedisModulesConnection<String, String> connection;
+
+    @BeforeAll
+    static void isRunning() {
+        Assertions.assertTrue(REDIS.isRunning());
     }
 
-    @ParameterizedTest(name = "can execute RedisGears function on {0}")
-    @MethodSource("containers")
-    void canExecuteRedisGearsFunction(RedisModulesContainer redisContainer) {
-        RedisGearsCommands<String, String> gears = sync(redisContainer);
-        ExecutionResults results = gears.pyExecute("GB().run()");
+    @BeforeEach
+    public void setupEach() {
+        this.client = RedisModulesClient.create(REDIS.getRedisURI());
+        this.connection = client.connect();
+    }
+
+    @AfterEach
+    public void cleanupEach() {
+        connection.sync().flushall();
+    }
+
+    @Test
+    void canWrite() {
+        Map<String, String> hash = new HashMap<>();
+        hash.put("field1", "value1");
+        connection.sync().hset("hash:test", hash);
+        Map<String, String> response = connection.sync().hgetall("hash:test");
+        Assertions.assertEquals(hash, response);
+    }
+
+    @Test
+    void canPing() {
+        Assertions.assertEquals("PONG", connection.sync().ping());
+    }
+
+    @Test
+    void canExecuteRedisGearsFunction() {
+        ExecutionResults results = connection.sync().pyExecute("GB().run()");
         Assertions.assertTrue(results.isOk());
     }
 
-    @ParameterizedTest(name = "can write to RedisTimeSeries at {0}")
-    @MethodSource("containers")
-    void canWriteToRedisTimeSeries(RedisModulesContainer redisContainer) {
-        RedisTimeSeriesCommands<String, String> ts = sync(redisContainer);
+    @Test
+    void canWriteToRedisTimeSeries() {
+        RedisTimeSeriesCommands<String, String> ts = connection.sync();
         ts.create("temperature:3:11", CreateOptions.builder().retentionTime(6000).build(), Label.of("sensor_id", "2"), Label.of("area_id", "32"));
         // TS.ADD temperature:3:11 1548149181 30
         Long add1 = ts.add("temperature:3:11", 1548149181, 30);
