@@ -2,6 +2,7 @@ package com.redislabs.testcontainers;
 
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.MountableFile;
 
 public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisClusterContainer> implements RedisContainer {
@@ -94,6 +95,11 @@ public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisCl
     public RedisClusterContainer withInitialPort(int port) {
         this.initialPort = port;
         return update();
+    }
+
+    @Override
+    public String toString() {
+        return ClassUtils.getShortClassName(getClass());
     }
 
 }
