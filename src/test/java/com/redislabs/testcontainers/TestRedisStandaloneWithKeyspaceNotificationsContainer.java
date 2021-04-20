@@ -45,6 +45,7 @@ public class TestRedisStandaloneWithKeyspaceNotificationsContainer {
         List<String> messages = new ArrayList<>();
         pubSubConnection.addListener(new PubSubListener(messages));
         pubSubConnection.sync().psubscribe("__keyspace@0__:*");
+        Thread.sleep(10);
         connection.sync().set("key1", "value");
         connection.sync().set("key2", "value");
         Thread.sleep(10);

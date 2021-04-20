@@ -48,6 +48,7 @@ public class TestRedisClusterWithKeyspaceNotificationsContainer {
         pubSubConnection.addListener(new PubSubListener(messages));
         pubSubConnection.setNodeMessagePropagation(true);
         pubSubConnection.sync().upstream().commands().psubscribe("__keyspace@0__:*");
+        Thread.sleep(10);
         connection.sync().set("key1", "value");
         connection.sync().set("key2", "value");
         Thread.sleep(10);
