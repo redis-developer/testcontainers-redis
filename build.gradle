@@ -120,4 +120,4 @@ tasks.named("dependencyUpdates").configure {
 afterReleaseBuild.dependsOn ":githubRelease"
 afterReleaseBuild.dependsOn ":publishToSonatype"
 afterReleaseBuild.dependsOn ":closeAndReleaseSonatypeStagingRepository"
-afterReleaseBuild.dependsOn ":publishToMavenLocal
+afterReleaseBuild.dependsOn ":publishToMavenLocal"
