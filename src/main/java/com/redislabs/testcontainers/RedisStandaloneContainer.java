@@ -16,6 +16,11 @@ public class RedisStandaloneContainer extends AbstractRedisContainer<RedisStanda
         super(dockerImageName);
     }
 
+    @Override
+    public boolean isCluster() {
+        return false;
+    }
+
     @SuppressWarnings("unchecked")
     public <C extends RedisStandaloneContainer> C withKeyspaceNotifications() {
         withCopyFileToContainer(MountableFile.forClasspathResource("redis-keyspace-notifications.conf"), "/data/redis.conf");

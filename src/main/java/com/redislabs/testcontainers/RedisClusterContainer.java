@@ -34,6 +34,12 @@ public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisCl
         waitingFor(Wait.forLogMessage(".*Cluster state changed: ok*\\n", 1));
     }
 
+    @Override
+    public boolean isCluster() {
+        return true;
+    }
+
+
     public RedisClusterContainer withKeyspaceNotifications() {
         setDockerImageName(KEYSPACE_NOTIFICATIONS_IMAGE_NAME);
         return this;
