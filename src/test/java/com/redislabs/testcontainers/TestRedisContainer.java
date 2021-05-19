@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Testcontainers
-public class TestRedisStandaloneContainer {
+public class TestRedisContainer {
 
     @Container
-    protected static final RedisStandaloneContainer REDIS = new RedisStandaloneContainer();
+    protected static final RedisContainer REDIS = new RedisContainer();
     private RedisClient client;
     private StatefulRedisConnection<String, String> connection;
 
@@ -31,6 +31,9 @@ public class TestRedisStandaloneContainer {
     @AfterEach
     public void cleanupEach() {
         connection.sync().flushall();
+        connection.close();
+        client.shutdown();
+        client.getResources().shutdown();
     }
 
     @Test

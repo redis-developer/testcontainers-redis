@@ -3,9 +3,8 @@ package com.redislabs.testcontainers;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
-import org.testcontainers.utility.MountableFile;
 
-public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisClusterContainer> implements RedisContainer {
+public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisClusterContainer> implements RedisServer {
 
     private static final String ENV_MASTERS = "MASTERS";
     private static final String ENV_SLAVES_PER_MASTER = "SLAVES_PER_MASTER";
@@ -73,7 +72,7 @@ public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisCl
         int[] ports = ports();
         String[] redisURIs = new String[ports.length];
         for (int index = 0; index < ports.length; index++) {
-            redisURIs[index] = RedisContainerUtils.redisURI(getHost(), ports[index]);
+            redisURIs[index] = RedisServer.redisURI(getHost(), ports[index]);
         }
         return redisURIs;
     }

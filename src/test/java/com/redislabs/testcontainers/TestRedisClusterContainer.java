@@ -35,6 +35,7 @@ public class TestRedisClusterContainer {
         connection.sync().flushall();
         connection.close();
         client.shutdown();
+        client.getResources().shutdown();
     }
 
     @Test

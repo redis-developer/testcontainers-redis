@@ -15,7 +15,7 @@ import java.util.List;
 public class TestRedisStandaloneWithKeyspaceNotificationsContainer {
 
     @Container
-    protected static final RedisStandaloneContainer REDIS = new RedisStandaloneContainer().withKeyspaceNotifications();
+    protected static final RedisContainer REDIS = new RedisContainer().withKeyspaceNotifications();
     private RedisClient client;
     private StatefulRedisConnection<String, String> connection;
     private StatefulRedisPubSubConnection<String, String> pubSubConnection;
@@ -38,6 +38,7 @@ public class TestRedisStandaloneWithKeyspaceNotificationsContainer {
         connection.close();
         pubSubConnection.close();
         client.shutdown();
+        client.getResources().shutdown();
     }
 
     @Test

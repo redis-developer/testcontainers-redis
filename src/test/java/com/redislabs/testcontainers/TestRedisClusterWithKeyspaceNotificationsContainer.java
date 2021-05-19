@@ -40,6 +40,7 @@ public class TestRedisClusterWithKeyspaceNotificationsContainer {
         connection.close();
         pubSubConnection.close();
         client.shutdown();
+        client.getResources().shutdown();
     }
 
     @Test

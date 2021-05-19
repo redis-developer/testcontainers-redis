@@ -1,11 +1,11 @@
 package com.redislabs.testcontainers;
 
 import com.redislabs.mesclun.RedisModulesClient;
-import com.redislabs.mesclun.StatefulRedisModulesConnection;
+import com.redislabs.mesclun.api.StatefulRedisModulesConnection;
+import com.redislabs.mesclun.api.sync.RedisTimeSeriesCommands;
 import com.redislabs.mesclun.gears.output.ExecutionResults;
 import com.redislabs.mesclun.timeseries.CreateOptions;
 import com.redislabs.mesclun.timeseries.Label;
-import com.redislabs.mesclun.timeseries.RedisTimeSeriesCommands;
 import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -37,6 +37,9 @@ public class TestRedisModulesContainer {
     @AfterEach
     public void cleanupEach() {
         connection.sync().flushall();
+        connection.close();
+        client.shutdown();
+        client.getResources().shutdown();
     }
 
     @Test

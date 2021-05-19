@@ -1,11 +1,12 @@
-package com.redislabs.testcontainers;
+package com.redislabs.testcontainers.support;
 
+import com.redislabs.testcontainers.RedisServer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 
-public abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> extends GenericContainer<C> implements RedisContainer {
+public abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> extends GenericContainer<C> implements RedisServer {
 
     public static final int REDIS_PORT = 6379;
 
@@ -26,7 +27,7 @@ public abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>
      */
     @Override
     public String getRedisURI() {
-        return RedisContainerUtils.redisURI(this);
+        return RedisServer.redisURI(this);
     }
 
     @Override
