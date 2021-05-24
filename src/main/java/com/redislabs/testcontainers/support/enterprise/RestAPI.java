@@ -26,6 +26,13 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.EntityUtils;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.ssl.SSLContexts;
+import com.redislabs.testcontainers.support.enterprise.rest.ActionStatus;
+import com.redislabs.testcontainers.support.enterprise.rest.Command;
+import com.redislabs.testcontainers.support.enterprise.rest.CommandResponse;
+import com.redislabs.testcontainers.support.enterprise.rest.Database;
+import com.redislabs.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
+import com.redislabs.testcontainers.support.enterprise.rest.Module;
+import com.redislabs.testcontainers.support.enterprise.rest.ModuleInstallResponse;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +48,6 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.util.List;
 
 
@@ -50,8 +56,6 @@ import java.util.List;
 @Builder
 public class RestAPI {
 
-    public static final int DEFAULT_REST_REQUEST_MAX_RETRIES = 10;
-    public static final long DEFAULT_REST_REQUEST_RETRY_INTERVAL = 3000;
     public static final Object CONTENT_TYPE_JSON = "application/json";
     public static final String V1 = "/v1/";
     public static final String V2 = "/v2/";
@@ -70,10 +74,6 @@ public class RestAPI {
     private String host = DEFAULT_HOST;
     @Builder.Default
     private int port = DEFAULT_PORT;
-    @Builder.Default
-    private int restRequestMaxRetries = DEFAULT_REST_REQUEST_MAX_RETRIES;
-    @Builder.Default
-    private Duration restRequestRetryInterval = Duration.ofMillis(DEFAULT_REST_REQUEST_RETRY_INTERVAL);
     private final UsernamePasswordCredentials credentials;
     private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -117,7 +117,7 @@ public class RestAPI {
         HttpPost post = new HttpPost(uri(path));
         String json = objectMapper.writeValueAsString(request);
         post.setEntity(new StringEntity(json));
-        log.info("Posting {}", json);
+        log.info("POST {}", json);
         return read(post, responseType);
     }
 
@@ -136,17 +136,11 @@ public class RestAPI {
 
     private <T> T read(ClassicHttpRequest request, JavaType type, int successCode) throws Exception {
         try (CloseableHttpClient client = client()) {
-            int retries = 0;
-            CloseableHttpResponse response;
-            do {
-                response = execute(request, client);
-                if (response.getCode() == successCode) {
-                    return objectMapper.readValue(EntityUtils.toString(response.getEntity()), type);
-                }
-                Thread.sleep(restRequestRetryInterval.toMillis());
-                retries++;
-            } while (retries < restRequestMaxRetries);
-            throw new HttpException("Redis Enterprise REST API responded with " + response);
+            CloseableHttpResponse response = execute(request, client);
+            if (response.getCode() == successCode) {
+                return objectMapper.readValue(EntityUtils.toString(response.getEntity()), type);
+            }
+            throw new HttpException(response.getCode() + ": " + EntityUtils.toString(response.getEntity()));
         }
     }
 
@@ -190,4 +184,5 @@ public class RestAPI {
     public CommandResponse command(long bdb, Command command) throws Exception {
         return post(v1(BDBS, String.valueOf(bdb), COMMAND), command, CommandResponse.class);
     }
+
 }

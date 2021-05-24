@@ -1,10 +1,10 @@
 package com.redislabs.testcontainers;
 
-import org.testcontainers.containers.FixedHostPortGenericContainer;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 
-public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisClusterContainer> implements RedisServer {
+public class RedisClusterContainer extends GenericContainer<RedisClusterContainer> implements RedisServer {
 
     private static final String ENV_MASTERS = "MASTERS";
     private static final String ENV_SLAVES_PER_MASTER = "SLAVES_PER_MASTER";
@@ -54,7 +54,7 @@ public class RedisClusterContainer extends FixedHostPortGenericContainer<RedisCl
         withEnv(ENV_MASTERS, String.valueOf(masters));
         withEnv(ENV_SLAVES_PER_MASTER, String.valueOf(slavesPerMaster));
         for (int port : ports()) {
-            withFixedExposedPort(port, port);
+            addFixedExposedPort(port, port);
         }
         return this;
     }

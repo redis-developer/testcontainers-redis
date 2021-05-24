@@ -9,6 +9,7 @@ import com.redislabs.mesclun.gears.RedisGearsUtils;
 import com.redislabs.mesclun.gears.output.ExecutionResults;
 import com.redislabs.mesclun.search.Field;
 import com.redislabs.mesclun.search.SearchResults;
+import com.redislabs.testcontainers.support.enterprise.rest.Database;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
@@ -64,7 +65,7 @@ public class TestRedisEnterpriseContainer {
         RedisEnterpriseContainer container = new RedisEnterpriseContainer();
         container.withShardCount(3);
         container.withOSSCluster();
-        container.withModules(RedisEnterpriseContainer.RedisModule.SEARCH);
+        container.withModules(Database.Module.SEARCH);
         try {
             container.start();
             RedisModulesClusterClient client = RedisModulesClusterClient.create(container.getRedisURI());
@@ -91,7 +92,7 @@ public class TestRedisEnterpriseContainer {
     void gears() {
         RedisEnterpriseContainer container = new RedisEnterpriseContainer();
         container.withShardCount(3);
-        container.withModules(RedisEnterpriseContainer.RedisModule.GEARS);
+        container.withModules(Database.Module.GEARS);
         try {
             container.start();
             RedisModulesClient client = RedisModulesClient.create(container.getRedisURI());
@@ -110,7 +111,7 @@ public class TestRedisEnterpriseContainer {
         RedisEnterpriseContainer container = new RedisEnterpriseContainer();
         container.withShardCount(3);
         container.withOSSCluster();
-        container.withModules(RedisEnterpriseContainer.RedisModule.GEARS);
+        container.withModules(Database.Module.GEARS);
         try {
             container.start();
             RedisModulesClusterClient client = RedisModulesClusterClient.create(container.getRedisURI());
