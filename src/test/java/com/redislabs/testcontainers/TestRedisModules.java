@@ -15,7 +15,7 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 @Testcontainers
-public class TestRedisModulesContainer {
+public class TestRedisModules {
 
 
     @Container

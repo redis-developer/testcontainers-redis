@@ -1,9 +1,7 @@
 package com.redislabs.testcontainers;
 
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.cluster.models.partitions.ClusterPartitionParser;
-import io.lettuce.core.cluster.models.partitions.Partitions;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
 import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -12,21 +10,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Testcontainers
-public class TestRedisClusterContainer {
+public class TestRedis {
 
     @Container
-    protected static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer();
-    private RedisClusterClient client;
-    private StatefulRedisClusterConnection<String, String> connection;
+    protected static final RedisContainer REDIS = new RedisContainer();
+    private RedisClient client;
+    private StatefulRedisConnection<String, String> connection;
 
     @BeforeAll
     static void isRunning() {
-        Assertions.assertTrue(REDIS_CLUSTER.isRunning());
+        Assertions.assertTrue(REDIS.isRunning());
     }
 
     @BeforeEach
     public void setupEach() {
-        this.client = RedisClusterClient.create(REDIS_CLUSTER.getRedisURI());
+        this.client = RedisClient.create(REDIS.getRedisURI());
         this.connection = client.connect();
     }
 
@@ -52,10 +50,4 @@ public class TestRedisClusterContainer {
         Assertions.assertEquals(hash, response);
     }
 
-    @Test
-    void canListNodes() {
-        String nodes = connection.sync().clusterNodes();
-        Partitions partitions = ClusterPartitionParser.parse(nodes);
-        Assertions.assertEquals(REDIS_CLUSTER.getRedisURIs().length, partitions.size());
-    }
 }

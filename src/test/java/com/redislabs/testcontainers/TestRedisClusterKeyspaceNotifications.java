@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Testcontainers
-public class TestRedisClusterWithKeyspaceNotificationsContainer {
+public class TestRedisClusterKeyspaceNotifications {
 
     @Container
     protected static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer().withKeyspaceNotifications();

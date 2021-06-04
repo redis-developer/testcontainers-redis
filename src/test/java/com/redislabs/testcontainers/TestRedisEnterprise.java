@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-public class TestRedisEnterpriseContainer {
+public class TestRedisEnterprise {
 
     @Test
     void singleShard() {
