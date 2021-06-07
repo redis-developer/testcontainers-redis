@@ -3,12 +3,14 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java-library-distribution'
+    id 'org.springframework.boot' version '2.5.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'io.freefair.lombok' version '6.0.0-m2'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-    id 'net.researchgate.release' version '2.8.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
-    id 'com.github.breadmoirai.github-release' version '2.2.12'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+    id 'org.jreleaser' version '0.4.0'
 }
 
 group = 'com.redislabs'
@@ -27,13 +29,21 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.testcontainers', name: 'testcontainers', version: testcontainers_version
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.2'
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: testcontainers_version
-    testImplementation 'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'org.testcontainers:testcontainers:1.15.3-REDISLABS'
+    testImplementation 'org.testcontainers:junit-jupiter:1.15.3-REDISLABS'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testImplementation 'org.slf4j:slf4j-simple'
     testImplementation 'com.redislabs:mesclun:1.3.3-SNAPSHOT'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
 }
 
 shadowJar {
@@ -63,39 +73,6 @@ publishing {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
         }
-//        mavenJava(MavenPublication) {
-//            from(components.java)
-//            versionMapping {
-//                usage('java-api') {
-//                    fromResolutionOf('runtimeClasspath')
-//                }
-//                usage('java-runtime') {
-//                    fromResolutionResult()
-//                }
-//            }
-//            pom {
-//                name = 'Testcontainers Redis'
-//                description = 'Redis modules for Testcontainers'
-//                url = 'https://github.com/redis-developer/testcontainers-redis'
-//                licenses {
-//                    license {
-//                        name = 'The Apache License, Version 2.0'
-//                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                    }
-//                }
-//                developers {
-//                    developer {
-//                        id = 'jruaux'
-//                        name = 'Julien Ruaux'
-//                    }
-//                }
-//                scm {
-//                    connection = 'scm:git:git://github.com/redis-developer/testcontainers-redis'
-//                    developerConnection = 'scm:git:git@github.com:redis-developer/testcontainers-redis'
-//                    url = 'https://github.com/redis-developer/testcontainers-redis'
-//                }
-//            }
-//        }
     }
 }
 
@@ -107,20 +84,6 @@ tasks.withType(Sign) {
     onlyIf { isReleaseVersion }
 }
 
-nexusPublishing {
-    repositories {
-        sonatype()
-    }
-}
-
-githubRelease {
-    token = project.hasProperty('githubToken') ? project.property('githubToken') : ''
-    owner "redis-developer"
-    repo "testcontainers-redis"
-    body changelog()
-    tagName "${project.version}"
-}
-
 def isNonStable = { String version ->
     def nonStableKeyword = ['PREVIEW'].any { it -> version.toUpperCase().contains(it) }
     def stableKeyword = ['RELEASE', 'FINAL', 'GA', 'JRE8'].any { it -> version.toUpperCase().contains(it) }
@@ -129,13 +92,32 @@ def isNonStable = { String version ->
 }
 
 tasks.named("dependencyUpdates").configure {
-
     rejectVersionIf {
         isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
-
 }
 
-release {
-    buildTasks = ['clean', 'build', 'publishToSonatype', 'closeAndReleaseSonatypeStagingRepository', 'githubRelease', 'publishToMavenLocal']
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
+
+jreleaser {
+    project {
+        name = 'testcontainers-redis'
+        description = 'Testcontainers Redis'
+        longDescription = 'Testcontainers extension for Redis, Redis Modules, and Redis Enterprise'
+        website = 'https://github.com/redis-developer/testcontainers-redis'
+        authors = ['Julien Ruaux']
+        tags = ['redis', 'testcontainers']
+        license = 'Apache-2.0'
+    }
+    release {
+        github {
+            username = 'jruaux'
+            owner = 'redis-developer'
+            overwrite = true
+        }
+    }
 }
