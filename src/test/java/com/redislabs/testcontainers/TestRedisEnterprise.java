@@ -91,7 +91,6 @@ public class TestRedisEnterprise {
     @Test
     void gears() {
         RedisEnterpriseContainer container = new RedisEnterpriseContainer();
-        container.withShardCount(3);
         container.withModules(Database.Module.GEARS);
         try {
             container.start();

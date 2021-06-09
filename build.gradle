@@ -1,14 +1,11 @@
 plugins {
     id 'java'
     id 'java-library'
+    id 'java-library-distribution'
     id 'maven-publish'
     id 'signing'
-    id 'java-library-distribution'
-    id 'org.springframework.boot' version '2.5.0'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'io.freefair.lombok' version '6.0.0-m2'
     id 'com.github.ben-manes.versions' version '0.39.0'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
     id 'org.jreleaser' version '0.4.0'
 }
@@ -26,58 +23,80 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/redis-developer/registry")
+        credentials {
+            username = project.findProperty("github.username") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
     implementation 'org.testcontainers:testcontainers:1.15.3-REDISLABS'
     testImplementation 'org.testcontainers:junit-jupiter:1.15.3-REDISLABS'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params'
-    testImplementation 'org.slf4j:slf4j-simple'
-    testImplementation 'com.redislabs:mesclun:1.3.3-SNAPSHOT'
-}
-
-bootJar {
-    enabled = false
-}
-
-jar {
-    enabled = true
-}
-
-shadowJar {
-    archiveClassifier.set('')
-    dependencies {
-        exclude(dependency('com.fasterxml.jackson.core:jackson-annotations'))
-        exclude(dependency('com.github.docker-java:docker-java-api'))
-        exclude(dependency('com.github.docker-java:docker-java-transport'))
-        exclude(dependency('com.github.docker-java:docker-java-transport-zerodep'))
-        exclude(dependency('junit:junit'))
-        exclude(dependency('net.java.dev.jna:jna'))
-        exclude(dependency('org.apache.commons:commons-compress'))
-        exclude(dependency('org.hamcrest:hamcrest-core'))
-        exclude(dependency('org.rnorth.duct-tape:duct-tape'))
-        exclude(dependency('org.slf4j:slf4j-api'))
-    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.2'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.30'
+    testImplementation 'com.redislabs:mesclun:1.3.3'
 }
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+        showExceptions true
+        exceptionFormat "full"
+        showCauses true
+        showStackTraces true
+    }
 }
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 publishing {
     publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
+        mavenJava(MavenPublication) {
+            from(components.java)
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Testcontainers Redis'
+                description = 'Redis modules for Testcontainers'
+                url = 'https://github.com/redis-developer/testcontainers-redis'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'jruaux'
+                        name = 'Julien Ruaux'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/redis-developer/testcontainers-redis'
+                    developerConnection = 'scm:git:git@github.com:redis-developer/testcontainers-redis'
+                    url = 'https://github.com/redis-developer/testcontainers-redis'
+                }
+            }
         }
     }
 }
 
 signing {
-    sign publishing.publications.shadow
+    sign publishing.publications.mavenJava
 }
 
 tasks.withType(Sign) {

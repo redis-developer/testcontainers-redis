@@ -60,7 +60,7 @@ public class RestAPI {
     public static final String V1 = "/v1/";
     public static final String V2 = "/v2/";
     public static final String DEFAULT_PROTOCOL = "https";
-    public static final String DEFAULT_HOST = "localhost";
+    public static final String DEFAULT_HOST = "127.0.0.1";
     public static final int DEFAULT_PORT = 9443;
     public static final String ACTIONS = "actions";
     public static final String MODULES = "modules";

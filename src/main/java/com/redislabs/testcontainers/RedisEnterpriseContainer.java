@@ -55,6 +55,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     private int shardCount = DEFAULT_SHARD_COUNT;
     private boolean ossCluster;
     private Database.Module[] modules = new Database.Module[0];
+    private String restAPIHost = RestAPI.DEFAULT_HOST;
 
     public RedisEnterpriseContainer() {
         super(DEFAULT_IMAGE_NAME);
@@ -64,6 +65,11 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         withPrivilegedMode(true);
         withPublishAllPorts(false);
         waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n", 1));
+    }
+
+    public RedisEnterpriseContainer withRestAPIHost(String host) {
+        this.restAPIHost = host;
+        return this;
     }
 
     public RedisEnterpriseContainer withProvisionerOptions(DatabaseProvisioner.Options options) {
@@ -101,7 +107,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         log.info("Setting Redis Enterprise node external IP");
         execute("/opt/redislabs/bin/rladmin", "node", "1", "external_addr", "set", NODE_EXTERNAL_ADDR);
         Thread.sleep(rladminWaitDuration.toMillis());
-        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())).build();
+        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())).host(restAPIHost).build();
         DatabaseProvisioner provisioner = DatabaseProvisioner.restAPI(restAPI).options(provisionerOptions).build();
         Database database = Database.name(databaseName).port(ENDPOINT_PORT).shardCount(shardCount).ossCluster(ossCluster).modules(modules).build();
         DatabaseCreateResponse response = provisioner.create(database);
