@@ -17,6 +17,7 @@ import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class TestRedisEnterprise {
     @Test
     void singleShard() {
         RedisEnterpriseContainer container = new RedisEnterpriseContainer();
+        container.withLogConsumer(new Slf4jLogConsumer(log));
         try {
             container.start();
             RedisClient client = RedisClient.create(container.getRedisURI());
