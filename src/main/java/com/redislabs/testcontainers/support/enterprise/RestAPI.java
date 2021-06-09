@@ -89,10 +89,6 @@ public class RestAPI {
         return path + String.join(PATH_SEPARATOR, segments);
     }
 
-    private static RestAPIBuilder builder() {
-        return new RestAPIBuilder();
-    }
-
     public static RestAPIBuilder credentials(UsernamePasswordCredentials credentials) {
         return new RestAPIBuilder().credentials(credentials);
     }
@@ -119,10 +115,6 @@ public class RestAPI {
         post.setEntity(new StringEntity(json));
         log.info("POST {}", json);
         return read(post, responseType);
-    }
-
-    private <T> T read(ClassicHttpRequest request, Class<T> type) throws Exception {
-        return read(request, SimpleType.constructUnsafe(type));
     }
 
     private <T> T read(ClassicHttpRequest request, JavaType type) throws Exception {
