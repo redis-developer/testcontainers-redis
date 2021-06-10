@@ -46,6 +46,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
     private static final int DEFAULT_SHARD_COUNT = 2;
     private static final String DEFAULT_DATABASE_NAME = "testcontainers";
+    private static final String RLADMIN = "/opt/redislabs/bin/rladmin";
     public static int ADMIN_PORT = 8443;
     public static int ENDPOINT_PORT = 12000;
 
@@ -104,11 +105,14 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         log.info("Creating Redis Enterprise cluster");
         String username = ADMIN_USERNAME;
         String password = ADMIN_PASSWORD;
-        execute("/opt/redislabs/bin/rladmin", "cluster", "create", "name", "cluster.local", "username", username, "password", password);
+        execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password);
+        Thread.sleep(rladminWaitDuration.toMillis());
+        log.info("Disabling IPv6 support on Redis Enterprise cluster");
+        execute(RLADMIN, "cluster", "config", "ipv6", "disabled");
         Thread.sleep(rladminWaitDuration.toMillis());
         String externalAddress = NODE_EXTERNAL_ADDR;
         log.info("Setting Redis Enterprise node external IP to {}", externalAddress);
-        execute("/opt/redislabs/bin/rladmin", "node", "1", "external_addr", "set", externalAddress);
+        execute(RLADMIN, "node", "1", "external_addr", "set", externalAddress);
         Thread.sleep(rladminWaitDuration.toMillis());
         String host = getHost();
         log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
