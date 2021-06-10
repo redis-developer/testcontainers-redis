@@ -102,12 +102,17 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     protected void containerIsStarted(InspectContainerResponse containerInfo) {
         super.containerIsStarted(containerInfo);
         log.info("Creating Redis Enterprise cluster");
-        execute("/opt/redislabs/bin/rladmin", "cluster", "create", "name", "cluster.local", "username", ADMIN_USERNAME, "password", ADMIN_PASSWORD);
+        String username = ADMIN_USERNAME;
+        String password = ADMIN_PASSWORD;
+        execute("/opt/redislabs/bin/rladmin", "cluster", "create", "name", "cluster.local", "username", username, "password", password);
         Thread.sleep(rladminWaitDuration.toMillis());
-        log.info("Setting Redis Enterprise node external IP");
-        execute("/opt/redislabs/bin/rladmin", "node", "1", "external_addr", "set", NODE_EXTERNAL_ADDR);
+        String externalAddress = NODE_EXTERNAL_ADDR;
+        log.info("Setting Redis Enterprise node external IP to {}", externalAddress);
+        execute("/opt/redislabs/bin/rladmin", "node", "1", "external_addr", "set", externalAddress);
         Thread.sleep(rladminWaitDuration.toMillis());
-        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())).host(getHost()).build();
+        String host = getHost();
+        log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
+        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(username, password.toCharArray())).host(host).build();
         DatabaseProvisioner provisioner = DatabaseProvisioner.restAPI(restAPI).options(provisionerOptions).build();
         Database database = Database.name(databaseName).port(ENDPOINT_PORT).shardCount(shardCount).ossCluster(ossCluster).modules(modules).build();
         DatabaseCreateResponse response = provisioner.create(database);
