@@ -43,21 +43,22 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     public static final String ADMIN_USERNAME = "testcontainers@redislabs.com";
     public static final String ADMIN_PASSWORD = "redislabs123";
     public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
-    private static final Duration DEFAULT_RLADMIN_WAIT_INTERVAL = Duration.ofMillis(500);
     private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
     private static final int DEFAULT_SHARD_COUNT = 2;
     private static final String DEFAULT_DATABASE_NAME = "testcontainers";
     private static final String RLADMIN = "/opt/redislabs/bin/rladmin";
+    private static final int DEFAULT_CLUSTER_BOOTSTRAP_MAX_RETRIES = 5;
+    private static final Duration DEFAULT_CLUSTER_BOOTSTRAP_RETRY_DELAY = Duration.ofSeconds(3);
     public static int ADMIN_PORT = 8443;
     public static int ENDPOINT_PORT = 12000;
 
     private DatabaseProvisioner.Options provisionerOptions = DatabaseProvisioner.Options.builder().build();
-    private Duration rladminWaitDuration = DEFAULT_RLADMIN_WAIT_INTERVAL;
     private String databaseName = DEFAULT_DATABASE_NAME;
     private int shardCount = DEFAULT_SHARD_COUNT;
     private boolean ossCluster;
     private Database.Module[] modules = new Database.Module[0];
-    private String restAPIHost = RestAPI.DEFAULT_HOST;
+    private int clusterBootstrapMaxRetries = DEFAULT_CLUSTER_BOOTSTRAP_MAX_RETRIES;
+    private Duration clusterBootstrapRetryDelay = DEFAULT_CLUSTER_BOOTSTRAP_RETRY_DELAY;
 
     public RedisEnterpriseContainer() {
         super(DEFAULT_IMAGE_NAME);
@@ -69,18 +70,18 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n", 1));
     }
 
-    public RedisEnterpriseContainer withRestAPIHost(String host) {
-        this.restAPIHost = host;
+    public RedisEnterpriseContainer withClusterBootstrapMaxRetries(int clusterBootstrapMaxRetries) {
+        this.clusterBootstrapMaxRetries = clusterBootstrapMaxRetries;
+        return this;
+    }
+
+    public RedisEnterpriseContainer withClusterBootstrapRetryDelay(Duration clusterBootstrapRetryDelay) {
+        this.clusterBootstrapRetryDelay = clusterBootstrapRetryDelay;
         return this;
     }
 
     public RedisEnterpriseContainer withProvisionerOptions(DatabaseProvisioner.Options options) {
         this.provisionerOptions = options;
-        return this;
-    }
-
-    public RedisEnterpriseContainer withRladminWaitDuration(Duration rladminWaitDuration) {
-        this.rladminWaitDuration = rladminWaitDuration;
         return this;
     }
 
@@ -107,23 +108,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         String password = ADMIN_PASSWORD;
         String externalAddress = NODE_EXTERNAL_ADDR;
         log.info("Bootstrapping Redis Enterprise cluster with username={}, password={}, external_adr={}", username, password, externalAddress);
-        int retries = 0;
-        ExecResult result;
-        do {
-            Thread.sleep(3000);
-            result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
-            retries++;
-        } while (result.getExitCode() != 0 && retries < 5);
-        if (result.getExitCode() != 0) {
-            throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr() + " " + result.getStdout());
-        }
-//        Thread.sleep(rladminWaitDuration.toMillis());
-//        log.info("Disabling IPv6 support on Redis Enterprise cluster");
-//        execute(RLADMIN, "cluster", "config", "ipv6", "disabled");
-//        Thread.sleep(rladminWaitDuration.toMillis());
-//        Thread.sleep(rladminWaitDuration.toMillis());
-//        Thread.sleep(rladminWaitDuration.toMillis());
-//        Thread.sleep(rladminWaitDuration.toMillis());
+        bootstrapCluster(username, password, externalAddress);
         String host = getHost();
         log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
         RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(username, password.toCharArray())).host(host).build();
@@ -131,6 +116,20 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         Database database = Database.name(databaseName).port(ENDPOINT_PORT).shardCount(shardCount).ossCluster(ossCluster).modules(modules).build();
         DatabaseCreateResponse response = provisioner.create(database);
         log.info("Created database {} with UID {}", database.getName(), response.getUid());
+    }
+
+    private void bootstrapCluster(String username, String password, String externalAddress) throws InterruptedException, IOException {
+        int retries = 0;
+        ExecResult result;
+        do {
+            result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
+            if (result.getExitCode() == 0) {
+                return;
+            }
+            Thread.sleep(clusterBootstrapRetryDelay.toMillis());
+            retries++;
+        } while (retries < clusterBootstrapMaxRetries);
+        throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr() + " " + result.getStdout());
     }
 
     public RedisEnterpriseContainer withOSSCluster() {
