@@ -107,9 +107,14 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         String password = ADMIN_PASSWORD;
         String externalAddress = NODE_EXTERNAL_ADDR;
         log.info("Bootstrapping Redis Enterprise cluster with username={}, password={}, external_adr={}", username, password, externalAddress);
-        ExecResult result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
+        int retries = 0;
+        ExecResult result;
+        do {
+            Thread.sleep(1000);
+            result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
+        } while (result.getExitCode() != 0 && retries < 3);
         if (result.getExitCode() != 0) {
-            throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr());
+            throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr() + " " + result.getStdout());
         }
 //        Thread.sleep(rladminWaitDuration.toMillis());
 //        log.info("Disabling IPv6 support on Redis Enterprise cluster");
