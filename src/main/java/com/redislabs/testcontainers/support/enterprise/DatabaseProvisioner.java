@@ -1,13 +1,13 @@
 package com.redislabs.testcontainers.support.enterprise;
 
 import com.redislabs.testcontainers.RedisEnterpriseContainer;
+import com.redislabs.testcontainers.support.RetryCallable;
 import com.redislabs.testcontainers.support.enterprise.rest.ActionStatus;
 import com.redislabs.testcontainers.support.enterprise.rest.Command;
 import com.redislabs.testcontainers.support.enterprise.rest.CommandResponse;
 import com.redislabs.testcontainers.support.enterprise.rest.Database;
 import com.redislabs.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
 import com.redislabs.testcontainers.support.enterprise.rest.Module;
-import com.redislabs.testcontainers.support.enterprise.rest.ModuleInstallResponse;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
@@ -22,9 +22,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
-@SuppressWarnings("BusyWait")
 @Slf4j
 public class DatabaseProvisioner {
 
@@ -77,20 +75,14 @@ public class DatabaseProvisioner {
         log.info("Creating database: {}", database);
         DatabaseCreateResponse databaseCreateResponse = restAPI.create(database);
         long uid = databaseCreateResponse.getUid();
-        long start = System.currentTimeMillis();
-        do {
+        return RetryCallable.delegate(() -> {
             log.info("Pinging database {}", uid);
-            try {
-                CommandResponse response = restAPI.command(uid, Command.command("PING").build());
-                if (response.getResponse().asBoolean()) {
-                    return databaseCreateResponse;
-                }
-            } catch (Exception e) {
-                // ignore
+            CommandResponse response = restAPI.command(uid, Command.command("PING").build());
+            if (response.getResponse().asBoolean()) {
+                return databaseCreateResponse;
             }
-            Thread.sleep(options.getPing().getInterval().toMillis());
-        } while (System.currentTimeMillis() - start < options.getPing().getTimeout().toMillis());
-        throw new TimeoutException("Timeout waiting for database " + databaseCreateResponse.getUid() + " to be ready");
+            throw new Exception("Database not ready");
+        }).sleep(options.getPing().getInterval()).timeout(options.getPing().getTimeout()).call();
     }
 
     private Map<String, String> availableModules() throws Exception {
@@ -108,21 +100,17 @@ public class DatabaseProvisioner {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IOUtils.copy(zipInputStream, baos);
             log.info("Installing module {}", GEARS_MODULE_FILE);
-            ModuleInstallResponse installResponse = restAPI.module(GEARS_MODULE_FILE, baos.toByteArray());
-            long start = System.currentTimeMillis();
-            ActionStatus status;
-            do {
-                log.info("Checking status of action {}", installResponse.getActionUID());
-                status = restAPI.actionStatus(installResponse.getActionUID());
+            String actionUID = restAPI.module(GEARS_MODULE_FILE, baos.toByteArray()).getActionUID();
+            RetryCallable.delegate(() -> {
+                log.info("Checking status of action {}", actionUID);
+                ActionStatus status = restAPI.actionStatus(actionUID);
                 if ("completed".equals(status.getStatus())) {
-                    log.info("Action {} completed", installResponse.getActionUID());
-                    return;
+                    log.info("Action {} completed", actionUID);
+                    return status;
                 }
-                log.info("Action {} {}", installResponse.getActionUID(), status.getStatus());
-                // Wait before checking again
-                Thread.sleep(options.getModuleInstallation().getCheckInterval().toMillis());
-            } while (System.currentTimeMillis() - start < options.getModuleInstallation().getTimeout().toMillis());
-            throw new ContainerLaunchException("Timed out waiting for module installation to complete. Action UID: " + installResponse.getActionUID());
+                log.info("Action {} {}", actionUID, status.getStatus());
+                throw new ContainerLaunchException("Timed out waiting for module installation to complete. Action UID: " + actionUID);
+            }).sleep(options.getModuleInstallation().getCheckInterval()).timeout(options.getModuleInstallation().getTimeout()).call();
         }
     }
 

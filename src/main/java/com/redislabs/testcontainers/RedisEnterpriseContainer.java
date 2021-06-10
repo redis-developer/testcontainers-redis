@@ -5,8 +5,10 @@ import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.exception.DockerException;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import com.redislabs.testcontainers.support.RetryCallable;
 import com.redislabs.testcontainers.support.enterprise.DatabaseProvisioner;
 import com.redislabs.testcontainers.support.enterprise.RestAPI;
+import com.redislabs.testcontainers.support.enterprise.rest.Bootstrap;
 import com.redislabs.testcontainers.support.enterprise.rest.Database;
 import com.redislabs.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
 import lombok.AccessLevel;
@@ -47,8 +49,10 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     private static final int DEFAULT_SHARD_COUNT = 2;
     private static final String DEFAULT_DATABASE_NAME = "testcontainers";
     private static final String RLADMIN = "/opt/redislabs/bin/rladmin";
-    private static final int DEFAULT_CLUSTER_BOOTSTRAP_MAX_RETRIES = 5;
-    private static final Duration DEFAULT_CLUSTER_BOOTSTRAP_RETRY_DELAY = Duration.ofSeconds(3);
+    private static final Duration DEFAULT_BOOTSTRAP_TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration DEFAULT_BOOTSTRAP_RETRY_DELAY = Duration.ofSeconds(3);
+    private static final Duration DEFAULT_CLUSTER_CREATE_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration DEFAULT_CLUSTER_CREATE_RETRY_DELAY = Duration.ofSeconds(3);
     public static int ADMIN_PORT = 8443;
     public static int ENDPOINT_PORT = 12000;
 
@@ -57,8 +61,10 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     private int shardCount = DEFAULT_SHARD_COUNT;
     private boolean ossCluster;
     private Database.Module[] modules = new Database.Module[0];
-    private int clusterBootstrapMaxRetries = DEFAULT_CLUSTER_BOOTSTRAP_MAX_RETRIES;
-    private Duration clusterBootstrapRetryDelay = DEFAULT_CLUSTER_BOOTSTRAP_RETRY_DELAY;
+    private Duration bootstrapTimeout = DEFAULT_BOOTSTRAP_TIMEOUT;
+    private Duration bootstrapRetryDelay = DEFAULT_BOOTSTRAP_RETRY_DELAY;
+    private Duration clusterCreateTimeout = DEFAULT_CLUSTER_CREATE_TIMEOUT;
+    private Duration clusterCreateRetryDelay = DEFAULT_CLUSTER_CREATE_RETRY_DELAY;
 
     public RedisEnterpriseContainer() {
         super(DEFAULT_IMAGE_NAME);
@@ -70,13 +76,23 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n", 1));
     }
 
-    public RedisEnterpriseContainer withClusterBootstrapMaxRetries(int clusterBootstrapMaxRetries) {
-        this.clusterBootstrapMaxRetries = clusterBootstrapMaxRetries;
+    public RedisEnterpriseContainer withBootstrapTimeout(Duration timeout) {
+        this.bootstrapTimeout = timeout;
         return this;
     }
 
-    public RedisEnterpriseContainer withClusterBootstrapRetryDelay(Duration clusterBootstrapRetryDelay) {
-        this.clusterBootstrapRetryDelay = clusterBootstrapRetryDelay;
+    public RedisEnterpriseContainer withBootstrapRetryDelay(Duration retryDelay) {
+        this.bootstrapRetryDelay = retryDelay;
+        return this;
+    }
+
+    public RedisEnterpriseContainer withClusterCreateTimeout(Duration timeout) {
+        this.clusterCreateTimeout = timeout;
+        return this;
+    }
+
+    public RedisEnterpriseContainer withClusterCreateRetryDelay(Duration retryDelay) {
+        this.clusterCreateRetryDelay = retryDelay;
         return this;
     }
 
@@ -104,32 +120,45 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     @Override
     protected void containerIsStarted(InspectContainerResponse containerInfo) {
         super.containerIsStarted(containerInfo);
+        RestAPI restAPI = RestAPI.builder().host(getHost()).build();
+        waitForBootstrap(restAPI);
         String username = ADMIN_USERNAME;
         String password = ADMIN_PASSWORD;
         String externalAddress = NODE_EXTERNAL_ADDR;
-        log.info("Bootstrapping Redis Enterprise cluster with username={}, password={}, external_adr={}", username, password, externalAddress);
-        bootstrapCluster(username, password, externalAddress);
+        log.info("Creating cluster with username={}, password={}, external_adr={}", username, password, externalAddress);
+        createCluster(username, password, externalAddress);
         String host = getHost();
         log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
-        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(username, password.toCharArray())).host(host).build();
+        restAPI.setCredentials(new UsernamePasswordCredentials(username, password.toCharArray()));
         DatabaseProvisioner provisioner = DatabaseProvisioner.restAPI(restAPI).options(provisionerOptions).build();
         Database database = Database.name(databaseName).port(ENDPOINT_PORT).shardCount(shardCount).ossCluster(ossCluster).modules(modules).build();
         DatabaseCreateResponse response = provisioner.create(database);
         log.info("Created database {} with UID {}", database.getName(), response.getUid());
     }
 
-    private void bootstrapCluster(String username, String password, String externalAddress) throws InterruptedException, IOException {
-        int retries = 0;
-        ExecResult result;
-        do {
-            result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
-            if (result.getExitCode() == 0) {
-                return;
+    private void waitForBootstrap(RestAPI restAPI) throws Exception {
+        RetryCallable.delegate(() -> {
+            log.info("Checking bootstrap status");
+            Bootstrap bootstrap = restAPI.bootstrap();
+            if ("idle".equals(bootstrap.getStatus().getState())) {
+                return bootstrap;
             }
-            Thread.sleep(clusterBootstrapRetryDelay.toMillis());
-            retries++;
-        } while (retries < clusterBootstrapMaxRetries);
-        throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr() + " " + result.getStdout());
+            throw new ContainerLaunchException("Timed out waiting for bootstrap");
+        }).sleep(bootstrapRetryDelay).timeout(bootstrapTimeout).call();
+    }
+
+    private void createCluster(String username, String password, String externalAddress) {
+        try {
+            RetryCallable.delegate(() -> {
+                ExecResult result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
+                if (result.getExitCode() == 0) {
+                    return result;
+                }
+                throw new Exception("Failed to create cluster: " + result.getStderr() + " " + result.getStdout());
+            }).sleep(clusterCreateRetryDelay).timeout(clusterCreateTimeout).call();
+        } catch (Exception e) {
+            throw new ContainerLaunchException("Could not create Redis Enterprise cluster", e);
+        }
     }
 
     public RedisEnterpriseContainer withOSSCluster() {

@@ -27,6 +27,7 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.E
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.ssl.SSLContexts;
 import com.redislabs.testcontainers.support.enterprise.rest.ActionStatus;
+import com.redislabs.testcontainers.support.enterprise.rest.Bootstrap;
 import com.redislabs.testcontainers.support.enterprise.rest.Command;
 import com.redislabs.testcontainers.support.enterprise.rest.CommandResponse;
 import com.redislabs.testcontainers.support.enterprise.rest.Database;
@@ -62,19 +63,20 @@ public class RestAPI {
     public static final String DEFAULT_PROTOCOL = "https";
     public static final String DEFAULT_HOST = "localhost";
     public static final int DEFAULT_PORT = 9443;
+    public static final String BOOTSTRAP = "bootstrap";
     public static final String ACTIONS = "actions";
     public static final String MODULES = "modules";
     public static final String BDBS = "bdbs";
     public static final String COMMAND = "command";
     private static final CharSequence PATH_SEPARATOR = "/";
 
+    private UsernamePasswordCredentials credentials;
     @Builder.Default
     private String protocol = DEFAULT_PROTOCOL;
     @Builder.Default
     private String host = DEFAULT_HOST;
     @Builder.Default
     private int port = DEFAULT_PORT;
-    private final UsernamePasswordCredentials credentials;
     private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private static String v1(String... segments) {
@@ -87,10 +89,6 @@ public class RestAPI {
 
     private static String join(String path, String[] segments) {
         return path + String.join(PATH_SEPARATOR, segments);
-    }
-
-    public static RestAPIBuilder credentials(UsernamePasswordCredentials credentials) {
-        return new RestAPIBuilder().credentials(credentials);
     }
 
     private URI uri(String path) throws URISyntaxException {
@@ -137,11 +135,13 @@ public class RestAPI {
     }
 
     private CloseableHttpResponse execute(ClassicHttpRequest request, CloseableHttpClient client) throws IOException {
-        BasicScheme basicAuth = new BasicScheme();
-        basicAuth.initPreemptive(credentials);
         HttpHost target = new HttpHost(protocol, host, port);
         HttpClientContext localContext = HttpClientContext.create();
-        localContext.resetAuthExchange(target, basicAuth);
+        if (credentials != null) {
+            BasicScheme basicAuth = new BasicScheme();
+            basicAuth.initPreemptive(credentials);
+            localContext.resetAuthExchange(target, basicAuth);
+        }
         return client.execute(request, localContext);
     }
 
@@ -167,6 +167,10 @@ public class RestAPI {
         builder.addPart("module", new ByteArrayBody(bytes, ContentType.MULTIPART_FORM_DATA, filename));
         post.setEntity(builder.build());
         return read(post, ModuleInstallResponse.class, HttpStatus.SC_ACCEPTED);
+    }
+
+    public Bootstrap bootstrap() throws Exception {
+        return get(v1(BOOTSTRAP), Bootstrap.class);
     }
 
     public ActionStatus actionStatus(String actionUID) throws Exception {

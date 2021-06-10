@@ -1,7 +1,5 @@
 package com.redislabs.testcontainers;
 
-import com.redislabs.mesclun.RedisModulesClient;
-import com.redislabs.mesclun.api.StatefulRedisModulesConnection;
 import com.redislabs.mesclun.api.sync.RedisGearsCommands;
 import com.redislabs.mesclun.cluster.RedisModulesClusterClient;
 import com.redislabs.mesclun.cluster.api.StatefulRedisModulesClusterConnection;
@@ -84,23 +82,6 @@ public class TestRedisEnterprise {
             } finally {
                 client.shutdown();
                 client.getResources().shutdown();
-            }
-        } finally {
-            container.stop();
-        }
-    }
-
-    @Test
-    void gears() {
-        RedisEnterpriseContainer container = new RedisEnterpriseContainer();
-        container.withModules(Database.Module.GEARS);
-        try {
-            container.start();
-            RedisModulesClient client = RedisModulesClient.create(container.getRedisURI());
-            try (StatefulRedisModulesConnection<String, String> connection = client.connect()) {
-                connection.sync().set("foo", "bar");
-                ExecutionResults results = pyExecute(connection.sync(), "sleep.py");
-                Assertions.assertEquals("1", results.getResults().get(0));
             }
         } finally {
             container.stop();
