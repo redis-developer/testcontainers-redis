@@ -110,10 +110,10 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         int retries = 0;
         ExecResult result;
         do {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
             result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
             retries++;
-        } while (result.getExitCode() != 0 && retries < 3);
+        } while (result.getExitCode() != 0 && retries < 5);
         if (result.getExitCode() != 0) {
             throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr() + " " + result.getStdout());
         }
