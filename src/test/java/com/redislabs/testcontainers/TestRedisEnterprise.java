@@ -1,7 +1,10 @@
 package com.redislabs.testcontainers;
 
+import com.redislabs.mesclun.api.sync.RedisGearsCommands;
 import com.redislabs.mesclun.cluster.RedisModulesClusterClient;
 import com.redislabs.mesclun.cluster.api.StatefulRedisModulesClusterConnection;
+import com.redislabs.mesclun.gears.RedisGearsUtils;
+import com.redislabs.mesclun.gears.output.ExecutionResults;
 import com.redislabs.mesclun.search.Field;
 import com.redislabs.mesclun.search.SearchResults;
 import com.redislabs.testcontainers.support.enterprise.rest.Database;
@@ -83,31 +86,31 @@ public class TestRedisEnterprise {
         }
     }
 
-//    @Test
-//    void gearsCluster() {
-//        RedisEnterpriseContainer container = new RedisEnterpriseContainer();
-//        container.withShardCount(3);
-//        container.withOSSCluster();
-//        container.withModules(Database.Module.GEARS);
-//        try {
-//            container.start();
-//            RedisModulesClusterClient client = RedisModulesClusterClient.create(container.getRedisURI());
-//            try (StatefulRedisModulesClusterConnection<String, String> connection = client.connect()) {
-//                connection.sync().set("foo", "bar");
-//                ExecutionResults results = pyExecute(connection.sync(), "sleep.py");
-//                Assertions.assertEquals("1", results.getResults().get(0));
-//            }
-//        } finally {
-//            container.stop();
-//        }
-//    }
+    @Test
+    void gearsCluster() {
+        RedisEnterpriseContainer container = new RedisEnterpriseContainer();
+        container.withShardCount(3);
+        container.withOSSCluster();
+        container.withModules(Database.Module.GEARS);
+        try {
+            container.start();
+            RedisModulesClusterClient client = RedisModulesClusterClient.create(container.getRedisURI());
+            try (StatefulRedisModulesClusterConnection<String, String> connection = client.connect()) {
+                connection.sync().set("foo", "bar");
+                ExecutionResults results = pyExecute(connection.sync(), "sleep.py");
+                Assertions.assertEquals("1", results.getResults().get(0));
+            }
+        } finally {
+            container.stop();
+        }
+    }
 
-//    private ExecutionResults pyExecute(RedisGearsCommands<String, String> sync, String resourceName) {
-//        return sync.pyExecute(load(resourceName));
-//    }
-//
-//    private String load(String resourceName) {
-//        return RedisGearsUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
-//    }
+    private ExecutionResults pyExecute(RedisGearsCommands<String, String> sync, String resourceName) {
+        return sync.pyExecute(load(resourceName));
+    }
+
+    private String load(String resourceName) {
+        return RedisGearsUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
+    }
 
 }
