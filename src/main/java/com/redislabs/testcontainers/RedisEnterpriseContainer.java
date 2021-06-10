@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.testcontainers.DockerClientFactory;
+import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
@@ -102,20 +103,20 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     @Override
     protected void containerIsStarted(InspectContainerResponse containerInfo) {
         super.containerIsStarted(containerInfo);
-        log.info("Creating Redis Enterprise cluster");
         String username = ADMIN_USERNAME;
         String password = ADMIN_PASSWORD;
-        execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password);
-        Thread.sleep(rladminWaitDuration.toMillis());
-        log.info("Disabling IPv6 support on Redis Enterprise cluster");
-        execute(RLADMIN, "cluster", "config", "ipv6", "disabled");
-        Thread.sleep(rladminWaitDuration.toMillis());
-        Thread.sleep(rladminWaitDuration.toMillis());
-        Thread.sleep(rladminWaitDuration.toMillis());
-        Thread.sleep(rladminWaitDuration.toMillis());
-//        String externalAddress = NODE_EXTERNAL_ADDR;
-//        log.info("Setting Redis Enterprise node external IP to {}", externalAddress);
-//        execute(RLADMIN, "node", "1", "external_addr", "set", externalAddress);
+        String externalAddress = NODE_EXTERNAL_ADDR;
+        log.info("Bootstrapping Redis Enterprise cluster with username={}, password={}, external_adr={}", username, password, externalAddress);
+        ExecResult result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username, "password", password, "external_addr", externalAddress);
+        if (result.getExitCode() != 0) {
+            throw new ContainerLaunchException("Could not create Redis Enterprise cluster: " + result.getStderr());
+        }
+//        Thread.sleep(rladminWaitDuration.toMillis());
+//        log.info("Disabling IPv6 support on Redis Enterprise cluster");
+//        execute(RLADMIN, "cluster", "config", "ipv6", "disabled");
+//        Thread.sleep(rladminWaitDuration.toMillis());
+//        Thread.sleep(rladminWaitDuration.toMillis());
+//        Thread.sleep(rladminWaitDuration.toMillis());
 //        Thread.sleep(rladminWaitDuration.toMillis());
         String host = getHost();
         log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
