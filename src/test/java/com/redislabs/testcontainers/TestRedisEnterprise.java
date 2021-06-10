@@ -85,32 +85,32 @@ public class TestRedisEnterprise {
             container.stop();
         }
     }
-
-    @Test
-    void gearsCluster() {
-        RedisEnterpriseContainer container = new RedisEnterpriseContainer();
-        container.withShardCount(3);
-        container.withOSSCluster();
-        container.withModules(Database.Module.GEARS);
-        try {
-            container.start();
-            RedisModulesClusterClient client = RedisModulesClusterClient.create(container.getRedisURI());
-            try (StatefulRedisModulesClusterConnection<String, String> connection = client.connect()) {
-                connection.sync().set("foo", "bar");
-                ExecutionResults results = pyExecute(connection.sync(), "sleep.py");
-                Assertions.assertEquals("1", results.getResults().get(0));
-            }
-        } finally {
-            container.stop();
-        }
-    }
-
-    private ExecutionResults pyExecute(RedisGearsCommands<String, String> sync, String resourceName) {
-        return sync.pyExecute(load(resourceName));
-    }
-
-    private String load(String resourceName) {
-        return RedisGearsUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
-    }
+//
+//    @Test
+//    void gearsCluster() {
+//        RedisEnterpriseContainer container = new RedisEnterpriseContainer();
+//        container.withShardCount(3);
+//        container.withOSSCluster();
+//        container.withModules(Database.Module.GEARS);
+//        try {
+//            container.start();
+//            RedisModulesClusterClient client = RedisModulesClusterClient.create(container.getRedisURI());
+//            try (StatefulRedisModulesClusterConnection<String, String> connection = client.connect()) {
+//                connection.sync().set("foo", "bar");
+//                ExecutionResults results = pyExecute(connection.sync(), "sleep.py");
+//                Assertions.assertEquals("1", results.getResults().get(0));
+//            }
+//        } finally {
+//            container.stop();
+//        }
+//    }
+//
+//    private ExecutionResults pyExecute(RedisGearsCommands<String, String> sync, String resourceName) {
+//        return sync.pyExecute(load(resourceName));
+//    }
+//
+//    private String load(String resourceName) {
+//        return RedisGearsUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
+//    }
 
 }
