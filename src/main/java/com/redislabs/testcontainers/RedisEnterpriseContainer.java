@@ -42,7 +42,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     public static final String ADMIN_USERNAME = "testcontainers@redislabs.com";
     public static final String ADMIN_PASSWORD = "redislabs123";
     public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
-    private static final long DEFAULT_RLADMIN_WAIT_INTERVAL = 500;
+    private static final Duration DEFAULT_RLADMIN_WAIT_INTERVAL = Duration.ofMillis(500);
     private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
     private static final int DEFAULT_SHARD_COUNT = 2;
     private static final String DEFAULT_DATABASE_NAME = "testcontainers";
@@ -51,7 +51,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     public static int ENDPOINT_PORT = 12000;
 
     private DatabaseProvisioner.Options provisionerOptions = DatabaseProvisioner.Options.builder().build();
-    private Duration rladminWaitDuration = Duration.ofMillis(DEFAULT_RLADMIN_WAIT_INTERVAL);
+    private Duration rladminWaitDuration = DEFAULT_RLADMIN_WAIT_INTERVAL;
     private String databaseName = DEFAULT_DATABASE_NAME;
     private int shardCount = DEFAULT_SHARD_COUNT;
     private boolean ossCluster;
@@ -110,10 +110,10 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         log.info("Disabling IPv6 support on Redis Enterprise cluster");
         execute(RLADMIN, "cluster", "config", "ipv6", "disabled");
         Thread.sleep(rladminWaitDuration.toMillis());
-        String externalAddress = NODE_EXTERNAL_ADDR;
-        log.info("Setting Redis Enterprise node external IP to {}", externalAddress);
-        execute(RLADMIN, "node", "1", "external_addr", "set", externalAddress);
-        Thread.sleep(rladminWaitDuration.toMillis());
+//        String externalAddress = NODE_EXTERNAL_ADDR;
+//        log.info("Setting Redis Enterprise node external IP to {}", externalAddress);
+//        execute(RLADMIN, "node", "1", "external_addr", "set", externalAddress);
+//        Thread.sleep(rladminWaitDuration.toMillis());
         String host = getHost();
         log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
         RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(username, password.toCharArray())).host(host).build();
