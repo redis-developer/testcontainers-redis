@@ -110,6 +110,9 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         log.info("Disabling IPv6 support on Redis Enterprise cluster");
         execute(RLADMIN, "cluster", "config", "ipv6", "disabled");
         Thread.sleep(rladminWaitDuration.toMillis());
+        Thread.sleep(rladminWaitDuration.toMillis());
+        Thread.sleep(rladminWaitDuration.toMillis());
+        Thread.sleep(rladminWaitDuration.toMillis());
 //        String externalAddress = NODE_EXTERNAL_ADDR;
 //        log.info("Setting Redis Enterprise node external IP to {}", externalAddress);
 //        execute(RLADMIN, "node", "1", "external_addr", "set", externalAddress);
