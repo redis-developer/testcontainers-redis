@@ -24,7 +24,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew --info build
+      run: ./gradlew build
       env:
         GITHUB_USERNAME: jruaux
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
