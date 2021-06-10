@@ -104,10 +104,10 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         log.info("Creating Redis Enterprise cluster");
         execute("/opt/redislabs/bin/rladmin", "cluster", "create", "name", "cluster.local", "username", ADMIN_USERNAME, "password", ADMIN_PASSWORD);
         Thread.sleep(rladminWaitDuration.toMillis());
-//        log.info("Setting Redis Enterprise node external IP");
-//        execute("/opt/redislabs/bin/rladmin", "node", "1", "external_addr", "set", NODE_EXTERNAL_ADDR);
-//        Thread.sleep(rladminWaitDuration.toMillis());
-        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())).host(restAPIHost).build();
+        log.info("Setting Redis Enterprise node external IP");
+        execute("/opt/redislabs/bin/rladmin", "node", "1", "external_addr", "set", NODE_EXTERNAL_ADDR);
+        Thread.sleep(rladminWaitDuration.toMillis());
+        RestAPI restAPI = RestAPI.credentials(new UsernamePasswordCredentials(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())).host(getHost()).build();
         DatabaseProvisioner provisioner = DatabaseProvisioner.restAPI(restAPI).options(provisionerOptions).build();
         Database database = Database.name(databaseName).port(ENDPOINT_PORT).shardCount(shardCount).ossCluster(ossCluster).modules(modules).build();
         DatabaseCreateResponse response = provisioner.create(database);
