@@ -18,7 +18,6 @@ import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,6 @@ import java.util.Map;
 public class DatabaseProvisioner {
 
     public static final String GEARS_MODULE_FILE = "redisgears.linux-bionic-x64.1.0.6.zip";
-    public static final String URL_GEARS_MODULE = "https://redismodules.s3.amazonaws.com/redisgears/" + GEARS_MODULE_FILE;
 
     private final RestAPI restAPI;
     private final Options options;
@@ -94,9 +92,7 @@ public class DatabaseProvisioner {
     }
 
     private void installGears() throws Exception {
-        URL url = new URL(URL_GEARS_MODULE);
-        log.info("Downloading module file {}", url);
-        try (InputStream zipInputStream = url.openStream()) {
+        try (InputStream zipInputStream = getClass().getClassLoader().getResourceAsStream(GEARS_MODULE_FILE)) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IOUtils.copy(zipInputStream, baos);
             log.info("Installing module {}", GEARS_MODULE_FILE);

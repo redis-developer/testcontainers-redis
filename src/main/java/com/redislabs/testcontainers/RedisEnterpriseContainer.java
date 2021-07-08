@@ -116,6 +116,11 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         return this;
     }
 
+    public RedisEnterpriseContainer withOSSCluster() {
+        this.ossCluster = true;
+        return this;
+    }
+
     @SneakyThrows
     @Override
     protected void containerIsStarted(InspectContainerResponse containerInfo) {
@@ -159,11 +164,6 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
         } catch (Exception e) {
             throw new ContainerLaunchException("Could not create Redis Enterprise cluster", e);
         }
-    }
-
-    public RedisEnterpriseContainer withOSSCluster() {
-        this.ossCluster = true;
-        return this;
     }
 
     @Override
