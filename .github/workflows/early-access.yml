@@ -42,7 +42,7 @@ jobs:
         if: failure()
         with:
           name: reports-${{ runner.os }}
-          path: build/
+          path: subprojects/testcontainers-redis/build/reports
 
       - name: Version
         id: vars
