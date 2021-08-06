@@ -25,6 +25,7 @@ import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 import org.testcontainers.utility.TestEnvironment;
 
 import java.io.IOException;
