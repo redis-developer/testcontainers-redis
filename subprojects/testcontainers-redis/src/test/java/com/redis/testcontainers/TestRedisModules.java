@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
 import com.redislabs.mesclun.RedisModulesClient;
 import com.redislabs.mesclun.api.StatefulRedisModulesConnection;

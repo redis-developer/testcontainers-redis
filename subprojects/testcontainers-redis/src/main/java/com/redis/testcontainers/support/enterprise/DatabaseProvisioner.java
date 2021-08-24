@@ -1,13 +1,13 @@
-package com.redislabs.testcontainers.support.enterprise;
+package com.redis.testcontainers.support.enterprise;
 
-import com.redislabs.testcontainers.RedisEnterpriseContainer;
-import com.redislabs.testcontainers.support.RetryCallable;
-import com.redislabs.testcontainers.support.enterprise.rest.ActionStatus;
-import com.redislabs.testcontainers.support.enterprise.rest.Command;
-import com.redislabs.testcontainers.support.enterprise.rest.CommandResponse;
-import com.redislabs.testcontainers.support.enterprise.rest.Database;
-import com.redislabs.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
-import com.redislabs.testcontainers.support.enterprise.rest.Module;
+import com.redis.testcontainers.RedisEnterpriseContainer;
+import com.redis.testcontainers.support.RetryCallable;
+import com.redis.testcontainers.support.enterprise.rest.ActionStatus;
+import com.redis.testcontainers.support.enterprise.rest.Command;
+import com.redis.testcontainers.support.enterprise.rest.CommandResponse;
+import com.redis.testcontainers.support.enterprise.rest.Database;
+import com.redis.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
+import com.redis.testcontainers.support.enterprise.rest.Module;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
@@ -93,6 +93,9 @@ public class DatabaseProvisioner {
 
     private void installGears() throws Exception {
         try (InputStream zipInputStream = getClass().getClassLoader().getResourceAsStream(GEARS_MODULE_FILE)) {
+            if (zipInputStream == null) {
+                throw new ContainerLaunchException(String.format("Could not find RedisGears module file '%s' in classpath", GEARS_MODULE_FILE));
+            }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IOUtils.copy(zipInputStream, baos);
             log.info("Installing module {}", GEARS_MODULE_FILE);

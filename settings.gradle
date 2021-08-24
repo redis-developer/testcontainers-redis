@@ -6,11 +6,11 @@ buildscript {
     }
     dependencies {
         classpath "org.kordamp.gradle:java-project-gradle-plugin:$kordampPluginVersion"
-        classpath "com.redislabs.gradle:redislabs-parentbuild:$redislabsBuildVersion"
+        classpath "com.redis.gradle:redis-parentbuild:$redisBuildVersion"
     }
 }
 
-apply plugin: 'com.redislabs.gradle.redislabs-parentbuild'
+apply plugin: 'com.redis.gradle.redis-parentbuild'
 
 rootProject.name = 'testcontainers-redis'
 

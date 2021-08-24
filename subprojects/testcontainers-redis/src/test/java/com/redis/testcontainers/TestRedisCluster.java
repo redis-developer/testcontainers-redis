@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;

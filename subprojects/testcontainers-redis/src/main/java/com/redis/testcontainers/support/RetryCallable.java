@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers.support;
+package com.redis.testcontainers.support;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -46,6 +46,7 @@ public class RetryCallable<T> implements Callable<T> {
         }
     }
 
+    @SuppressWarnings("BusyWait")
     @Override
     public T call() throws Exception {
         Exception lastException;

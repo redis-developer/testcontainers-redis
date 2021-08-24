@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers.support.enterprise.rest;
+package com.redis.testcontainers.support.enterprise.rest;
 
 import lombok.Data;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;

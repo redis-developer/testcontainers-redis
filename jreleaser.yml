@@ -15,7 +15,6 @@ project:
 
 release:
   github:
-    branch: master
     username: jruaux
     overwrite: true
     changelog:
@@ -58,3 +57,5 @@ release:
 files:
   artifacts:
     - path: VERSION
+    - path: subprojects/testcontainers-redis/build/distributions/testcontainers-redis-{{projectVersion}}.zip
+      transform: testcontainers-redis-{{projectEffectiveVersion}}.zip

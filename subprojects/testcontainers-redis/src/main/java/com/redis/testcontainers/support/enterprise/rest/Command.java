@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers.support.enterprise.rest;
+package com.redis.testcontainers.support.enterprise.rest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

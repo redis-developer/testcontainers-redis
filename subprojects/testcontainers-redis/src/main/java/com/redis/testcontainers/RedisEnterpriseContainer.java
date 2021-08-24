@@ -1,16 +1,16 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.exception.DockerException;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
-import com.redislabs.testcontainers.support.RetryCallable;
-import com.redislabs.testcontainers.support.enterprise.DatabaseProvisioner;
-import com.redislabs.testcontainers.support.enterprise.RestAPI;
-import com.redislabs.testcontainers.support.enterprise.rest.Bootstrap;
-import com.redislabs.testcontainers.support.enterprise.rest.Database;
-import com.redislabs.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
+import com.redis.testcontainers.support.RetryCallable;
+import com.redis.testcontainers.support.enterprise.DatabaseProvisioner;
+import com.redis.testcontainers.support.enterprise.RestAPI;
+import com.redis.testcontainers.support.enterprise.rest.Bootstrap;
+import com.redis.testcontainers.support.enterprise.rest.Database;
+import com.redis.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,7 +25,6 @@ import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MountableFile;
 import org.testcontainers.utility.TestEnvironment;
 
 import java.io.IOException;
@@ -43,8 +42,8 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     public static final String MODULE_SEARCH = "search";
     public static final String MODULE_TIMESERIES = "timeseries";
 
-    public static final String ADMIN_USERNAME = "testcontainers@redislabs.com";
-    public static final String ADMIN_PASSWORD = "redislabs123";
+    public static final String ADMIN_USERNAME = "testcontainers@redis.com";
+    public static final String ADMIN_PASSWORD = "redis123";
     public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
     private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
     private static final int DEFAULT_SHARD_COUNT = 2;

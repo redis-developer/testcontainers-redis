@@ -1,6 +1,6 @@
-package com.redislabs.testcontainers.support;
+package com.redis.testcontainers.support;
 
-import com.redislabs.testcontainers.RedisServer;
+import com.redis.testcontainers.RedisServer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;

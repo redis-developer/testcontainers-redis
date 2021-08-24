@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
 import org.testcontainers.containers.GenericContainer;
 

@@ -1,6 +1,6 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
-import com.redislabs.testcontainers.support.AbstractRedisContainer;
+import com.redis.testcontainers.support.AbstractRedisContainer;
 import org.testcontainers.utility.DockerImageName;
 
 public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesContainer> {

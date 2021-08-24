@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers.support.enterprise;
+package com.redis.testcontainers.support.enterprise;
 
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -26,14 +26,14 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.EntityUtils;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.ssl.SSLContexts;
-import com.redislabs.testcontainers.support.enterprise.rest.ActionStatus;
-import com.redislabs.testcontainers.support.enterprise.rest.Bootstrap;
-import com.redislabs.testcontainers.support.enterprise.rest.Command;
-import com.redislabs.testcontainers.support.enterprise.rest.CommandResponse;
-import com.redislabs.testcontainers.support.enterprise.rest.Database;
-import com.redislabs.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
-import com.redislabs.testcontainers.support.enterprise.rest.Module;
-import com.redislabs.testcontainers.support.enterprise.rest.ModuleInstallResponse;
+import com.redis.testcontainers.support.enterprise.rest.ActionStatus;
+import com.redis.testcontainers.support.enterprise.rest.Bootstrap;
+import com.redis.testcontainers.support.enterprise.rest.Command;
+import com.redis.testcontainers.support.enterprise.rest.CommandResponse;
+import com.redis.testcontainers.support.enterprise.rest.Database;
+import com.redis.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
+import com.redis.testcontainers.support.enterprise.rest.Module;
+import com.redis.testcontainers.support.enterprise.rest.ModuleInstallResponse;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

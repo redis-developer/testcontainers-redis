@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
 import com.redislabs.mesclun.RedisModulesClient;
 import com.redislabs.mesclun.api.StatefulRedisModulesConnection;
@@ -7,7 +7,7 @@ import com.redislabs.mesclun.cluster.api.StatefulRedisModulesClusterConnection;
 import com.redislabs.mesclun.gears.RedisGearsUtils;
 import com.redislabs.mesclun.search.Field;
 import com.redislabs.mesclun.search.SearchResults;
-import com.redislabs.testcontainers.support.enterprise.rest.Database;
+import com.redis.testcontainers.support.enterprise.rest.Database;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
@@ -102,6 +102,7 @@ public class TestRedisEnterprise {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private String load(String resourceName) {
         return RedisGearsUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
     }

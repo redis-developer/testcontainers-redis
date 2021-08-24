@@ -1,4 +1,4 @@
-package com.redislabs.testcontainers;
+package com.redis.testcontainers;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -85,7 +85,7 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
         if (count <= 0) {
             throw new IllegalArgumentException("Count must be greater than zero");
         }
-        this.masters = masters;
+        this.masters = count;
         return update();
     }
 
