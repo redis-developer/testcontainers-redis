@@ -1,11 +1,11 @@
 package com.redis.testcontainers;
 
-import com.redislabs.mesclun.RedisModulesClient;
-import com.redislabs.mesclun.api.StatefulRedisModulesConnection;
-import com.redislabs.mesclun.api.sync.RedisTimeSeriesCommands;
-import com.redislabs.mesclun.gears.output.ExecutionResults;
-import com.redislabs.mesclun.timeseries.CreateOptions;
-import com.redislabs.mesclun.timeseries.Label;
+import com.redis.lettucemod.RedisModulesClient;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import com.redis.lettucemod.api.sync.RedisTimeSeriesCommands;
+import com.redis.lettucemod.gears.output.ExecutionResults;
+import com.redis.lettucemod.timeseries.CreateOptions;
+import com.redis.lettucemod.timeseries.Label;
 import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;

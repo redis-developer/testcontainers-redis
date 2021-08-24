@@ -1,12 +1,12 @@
 package com.redis.testcontainers;
 
-import com.redislabs.mesclun.RedisModulesClient;
-import com.redislabs.mesclun.api.StatefulRedisModulesConnection;
-import com.redislabs.mesclun.cluster.RedisModulesClusterClient;
-import com.redislabs.mesclun.cluster.api.StatefulRedisModulesClusterConnection;
-import com.redislabs.mesclun.gears.RedisGearsUtils;
-import com.redislabs.mesclun.search.Field;
-import com.redislabs.mesclun.search.SearchResults;
+import com.redis.lettucemod.RedisModulesClient;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import com.redis.lettucemod.cluster.RedisModulesClusterClient;
+import com.redis.lettucemod.cluster.api.StatefulRedisModulesClusterConnection;
+import com.redis.lettucemod.gears.RedisGearsUtils;
+import com.redis.lettucemod.search.Field;
+import com.redis.lettucemod.search.SearchResults;
 import com.redis.testcontainers.support.enterprise.rest.Database;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
