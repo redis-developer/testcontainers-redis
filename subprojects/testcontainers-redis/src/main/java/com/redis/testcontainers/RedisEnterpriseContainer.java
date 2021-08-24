@@ -53,8 +53,8 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
     private static final Duration DEFAULT_BOOTSTRAP_RETRY_DELAY = Duration.ofSeconds(3);
     private static final Duration DEFAULT_CLUSTER_CREATE_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration DEFAULT_CLUSTER_CREATE_RETRY_DELAY = Duration.ofSeconds(3);
-    public static int ADMIN_PORT = 8443;
-    public static int ENDPOINT_PORT = 12000;
+    public static final int ADMIN_PORT = 8443;
+    public static final int ENDPOINT_PORT = 12000;
 
     private DatabaseProvisioner.Options provisionerOptions = DatabaseProvisioner.Options.builder().build();
     private String databaseName = DEFAULT_DATABASE_NAME;

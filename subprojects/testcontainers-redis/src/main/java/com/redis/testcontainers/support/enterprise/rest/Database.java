@@ -106,7 +106,7 @@ public class Database {
         BLOOM("bf"), GEARS("rg"), GRAPH("graph"), JSON("ReJSON"), SEARCH("search"), TIMESERIES("timeseries");
 
         @Getter
-        private String name;
+        private final String name;
 
         Module(String name) {
             this.name = name;

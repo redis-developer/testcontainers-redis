@@ -9,6 +9,4 @@ image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-
 image:https://img.shields.io/maven-central/v/{project-group}/{project-name}.svg[Download, link="https://search.maven.org/#search|ga|1|{project-name}"]
 image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/total[GitHub all releases]
 
----
-
 Testcontainers Redis is an extension of Testcontainers that supports Redis, Redis Modules, and Redis Enterprise.
