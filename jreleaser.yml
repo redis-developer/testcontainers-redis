@@ -7,7 +7,7 @@ project:
     - Julien Ruaux
   license: Apache-2.0
   java:
-    groupId: com.redislabs.testcontainers
+    groupId: com.redis.testcontainers
     version: 8
     multiProject: true
   extraProperties:

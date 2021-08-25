@@ -1,6 +1,6 @@
 dependencies {
-    implementation 'com.redislabs.testcontainers:testcontainers:1.15.3'
-    testImplementation 'com.redislabs.testcontainers:junit-jupiter:1.15.3'
+    implementation 'com.redis.testcontainers:testcontainers:1.15.3'
+    testImplementation 'com.redis.testcontainers:junit-jupiter:1.15.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.2'

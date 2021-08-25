@@ -2,7 +2,7 @@
 :linkattrs:
 :project-owner:   redis-developer
 :project-name:    testcontainers-redis
-:project-group:   com.redislabs.testcontainers
+:project-group:   com.redis.testcontainers
 :project-version: 1.3.2
 
 image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
