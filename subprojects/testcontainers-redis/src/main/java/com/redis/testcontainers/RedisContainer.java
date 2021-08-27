@@ -13,8 +13,12 @@ public class RedisContainer extends AbstractRedisContainer<RedisContainer> {
         this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
     }
 
-    protected RedisContainer(final DockerImageName dockerImageName) {
+    public RedisContainer(final DockerImageName dockerImageName) {
         super(dockerImageName);
+    }
+
+    public RedisContainer(final String tag) {
+        this(DEFAULT_IMAGE_NAME.withTag(tag));
     }
 
     @Override

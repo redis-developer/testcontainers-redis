@@ -12,13 +12,17 @@ public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesCo
         this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
     }
 
+    public RedisModulesContainer(final DockerImageName dockerImageName) {
+        super(dockerImageName);
+    }
+
+    public RedisModulesContainer(final String tag) {
+        this(DEFAULT_IMAGE_NAME.withTag(tag));
+    }
+
     @Override
     public boolean isCluster() {
         return false;
-    }
-
-    protected RedisModulesContainer(final DockerImageName dockerImageName) {
-        super(dockerImageName);
     }
 
 }

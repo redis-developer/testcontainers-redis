@@ -17,7 +17,6 @@ import java.util.Map;
 @Testcontainers
 public class TestRedisModules {
 
-
     @Container
     protected static final RedisModulesContainer REDIS = new RedisModulesContainer();
     private RedisModulesClient client;
