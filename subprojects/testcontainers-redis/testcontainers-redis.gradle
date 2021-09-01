@@ -1,9 +1,9 @@
 dependencies {
-    implementation 'com.redis.testcontainers:testcontainers:1.15.3'
-    testImplementation 'com.redis.testcontainers:junit-jupiter:1.15.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.2'
+    implementation group: 'com.redis.testcontainers', name: 'testcontainers', version: testcontainersVersion
+    testImplementation group: 'com.redis.testcontainers', name: 'junit-jupiter', version: testcontainersVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
     testImplementation 'org.slf4j:slf4j-simple:1.7.30'
     testImplementation 'com.redis:lettucemod:1.5.1'
 }
