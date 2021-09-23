@@ -4,6 +4,6 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
-    testImplementation 'org.slf4j:slf4j-simple:1.7.30'
-    testImplementation 'com.redis:lettucemod:1.5.1'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: slf4jVersion
+    testImplementation group: 'com.redis', name: 'lettucemod', version: lettucemodVersion
 }
