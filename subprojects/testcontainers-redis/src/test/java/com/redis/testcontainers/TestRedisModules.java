@@ -3,17 +3,19 @@ package com.redis.testcontainers;
 import com.redis.lettucemod.RedisModulesClient;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
 import com.redis.lettucemod.api.sync.RedisTimeSeriesCommands;
-import com.redis.lettucemod.gears.output.ExecutionResults;
-import com.redis.lettucemod.timeseries.CreateOptions;
-import com.redis.lettucemod.timeseries.Label;
-import org.junit.jupiter.api.*;
+import com.redis.lettucemod.api.timeseries.CreateOptions;
+import com.redis.lettucemod.output.ExecutionResults;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
 @Testcontainers
 public class TestRedisModules {
 
@@ -57,14 +59,14 @@ public class TestRedisModules {
 
     @Test
     void canExecuteRedisGearsFunction() {
-        ExecutionResults results = connection.sync().pyExecute("GB().run()");
+        ExecutionResults results = connection.sync().pyexecute("GB().run()");
         Assertions.assertTrue(results.isOk());
     }
 
     @Test
     void canWriteToRedisTimeSeries() {
         RedisTimeSeriesCommands<String, String> ts = connection.sync();
-        ts.create("temperature:3:11", CreateOptions.builder().retentionTime(6000).build(), Label.of("sensor_id", "2"), Label.of("area_id", "32"));
+        ts.create("temperature:3:11", CreateOptions.<String, String>builder().retentionTime(6000).label("sensor_id", "2").label("area_id", "32").build());
         // TS.ADD temperature:3:11 1548149181 30
         Long add1 = ts.add("temperature:3:11", 1548149181, 30);
         Assertions.assertEquals(1548149181, add1);

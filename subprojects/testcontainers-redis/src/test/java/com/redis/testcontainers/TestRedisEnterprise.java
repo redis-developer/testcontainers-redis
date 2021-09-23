@@ -1,12 +1,12 @@
 package com.redis.testcontainers;
 
 import com.redis.lettucemod.RedisModulesClient;
+import com.redis.lettucemod.Utils;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import com.redis.lettucemod.api.search.Field;
+import com.redis.lettucemod.api.search.SearchResults;
 import com.redis.lettucemod.cluster.RedisModulesClusterClient;
 import com.redis.lettucemod.cluster.api.StatefulRedisModulesClusterConnection;
-import com.redis.lettucemod.gears.RedisGearsUtils;
-import com.redis.lettucemod.search.Field;
-import com.redis.lettucemod.search.SearchResults;
 import com.redis.testcontainers.support.enterprise.rest.Database;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -95,7 +95,7 @@ public class TestRedisEnterprise {
             RedisModulesClient client = RedisModulesClient.create(container.getRedisURI());
             try (StatefulRedisModulesConnection<String, String> connection = client.connect()) {
                 connection.sync().set("foo", "bar");
-                connection.sync().pyExecute(load("sleep.py"));
+                connection.sync().pyexecute(load("sleep.py"));
             }
         } finally {
             container.stop();
@@ -104,7 +104,7 @@ public class TestRedisEnterprise {
 
     @SuppressWarnings("ConstantConditions")
     private String load(String resourceName) {
-        return RedisGearsUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
+        return Utils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
     }
 
 }
