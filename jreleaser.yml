@@ -15,13 +15,26 @@ project:
 
 release:
   github:
-    username: jruaux
     overwrite: true
+    sign: true
     changelog:
-      sort: DESC
       formatted: ALWAYS
       format: '- {{commitShortHash}} {{commitTitle}}'
+      contributors:
+        enabled: false
       labelers:
+        - label: 'merge_pull'
+          title: 'Merge pull'
+        - label: 'merge_branch'
+          title: 'Merge branch'
+        - label: 'translation'
+          title: '[translation]'
+        - label: 'task'
+          title: '[chore]'
+        - label: 'dependencies'
+          title: '[deps]'
+        - label: 'build'
+          title: '[build]'
         - label: 'feature'
           title: 'Resolves #'
           body: 'Resolves #'
@@ -31,11 +44,11 @@ release:
         - label: 'issue'
           title: 'Relates to #'
           body: 'Relates to #'
-        - label: 'task'
-          title: '[chore]'
-        - label: 'dependencies'
-          title: '[deps]'
       categories:
+        - title: 'Merge'
+          labels:
+            - 'merge_pull'
+            - 'merge_branch'
         - title: '🚀 Features'
           labels:
             - 'feature'
@@ -45,17 +58,46 @@ release:
         - title: '🧰 Tasks'
           labels:
             - 'task'
-        - title: '⚙️ Dependencies'
+        - title: '🌐 Translation'
+          labels:
+            - 'translation'
+        - title: '⚙️  Dependencies'
           labels:
             - 'dependencies'
+        - title: '🛠  Build'
+          labels:
+            - 'build'
+        - title: 'allcontributors'
+          labels:
+            - 'allcontributors'
+      hide:
+        categories:
+          - 'Merge'
+          - 'allcontributors'
+        contributors:
+          - 'GitHub'
+          - 'allcontributors'
       replacers:
         - search: '\[chore\] '
-          replace: ''
         - search: '\[deps\] '
-          replace: ''
+        - search: '\[translation\] '
+        - search: '\[build\] '
+
+signing:
+  active: always
+  armored: true
+  files: false
+
+checksum:
+  files: false
+
+distributions:
+  testcontainers-redis:
+    artifacts:
+      - path: subprojects/{{distributionName}}/build/distributions/{{distributionName}}-{{projectVersion}}.zip
+        transform: '{{distributionName}}/{{distributionName}}-{{projectEffectiveVersion}}.zip'
+
 
 files:
   artifacts:
     - path: VERSION
-    - path: subprojects/testcontainers-redis/build/distributions/testcontainers-redis-{{projectVersion}}.zip
-      transform: testcontainers-redis-{{projectEffectiveVersion}}.zip
