@@ -53,7 +53,6 @@ allprojects {
         gradlePluginPortal()
         mavenCentral()
         mavenLocal()
-        maven { url 'https://projectlombok.org/edge-releases' }
     }
 
     tasks.withType(GenerateModuleMetadata) {
@@ -72,9 +71,8 @@ subprojects {
     test {
         useJUnitPlatform()
     }
-
-    lombok {
-        version = "edge-SNAPSHOT"
-    }
+    
+    sourceCompatibility = 8
+    targetCompatibility = 8
 
 }

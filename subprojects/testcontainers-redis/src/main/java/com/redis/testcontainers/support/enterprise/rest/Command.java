@@ -1,44 +1,36 @@
 package com.redis.testcontainers.support.enterprise.rest;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.testcontainers.shaded.com.google.common.base.Preconditions;
-
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Command {
 
-    private String command;
-    private List<String> args;
+	private String command;
+	private List<String> args = new ArrayList<>();
 
-    public static CommandBuilder command(String command) {
-        return new CommandBuilder(command);
-    }
+	public String getCommand() {
+		return command;
+	}
 
-    @Setter
-    @Accessors(fluent = true)
-    public static class CommandBuilder {
+	public void setCommand(String command) {
+		this.command = command;
+	}
 
-        private final String command;
-        private List<String> args;
+	public List<String> getArgs() {
+		return args;
+	}
 
-        public CommandBuilder(String command) {
-            Preconditions.checkNotNull(command, "Command must not be null");
-            this.command = command;
-        }
+	public void setArgs(List<String> args) {
+		this.args = args;
+	}
 
-        public Command build() {
-            return new Command(command, args);
-        }
-
-    }
+	public static Command of(String commandString) {
+		Command command = new Command();
+		command.setCommand(commandString);
+		return command;
+	}
 
 }

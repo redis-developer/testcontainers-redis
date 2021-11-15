@@ -1,27 +1,30 @@
 package com.redis.testcontainers.support.enterprise.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DatabaseCreateResponse {
+public class ModuleResponse {
 
 	private String name;
-	private long uid;
+	private String id;
 
 	public String getName() {
 		return name;
 	}
 
+	@JsonProperty("module_name")
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public long getUid() {
-		return uid;
+	public String getId() {
+		return id;
 	}
 
-	public void setUid(long uid) {
-		this.uid = uid;
+	@JsonProperty("uid")
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

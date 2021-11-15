@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Testcontainers
-public class TestRedisCluster {
+class RedisClusterTests {
 
     @Container
     protected static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer();

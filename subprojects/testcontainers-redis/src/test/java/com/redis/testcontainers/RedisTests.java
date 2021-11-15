@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Testcontainers
-public class TestRedis {
+class RedisTests {
 
     @Container
     protected static final RedisContainer REDIS = new RedisContainer();
