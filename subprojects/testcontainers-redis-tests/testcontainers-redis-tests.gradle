@@ -1,0 +1,3 @@
+dependencies {
+    testImplementation project(':testcontainers-redis-junit-jupiter')
+}

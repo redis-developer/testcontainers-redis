@@ -48,6 +48,12 @@ config {
     }
 }
 
+eclipse {
+    project {
+        name = 'testcontainers-redis-root'
+    }
+}
+
 allprojects {
     repositories {
         gradlePluginPortal()

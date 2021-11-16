@@ -32,10 +32,7 @@ projects {
 }
 
 enforce {
-    mergeStrategy = 'append'
+   
+    enabled = false    
 
-    rule(enforcer.rules.ForceDependencies) { r ->
-        r.dependencies.addAll "org.slf4j:slf4j-api:1.7.30",
-        "org.junit.jupiter:junit-jupiter-api:5.7.2"
-    }
 }
