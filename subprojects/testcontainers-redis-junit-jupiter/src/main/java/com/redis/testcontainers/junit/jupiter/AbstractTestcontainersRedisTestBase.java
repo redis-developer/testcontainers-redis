@@ -1,6 +1,7 @@
 package com.redis.testcontainers.junit.jupiter;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.awaitility.Awaitility;
@@ -30,30 +31,39 @@ import com.redis.testcontainers.RedisServer;
 @TestInstance(Lifecycle.PER_CLASS)
 public abstract class AbstractTestcontainersRedisTestBase {
 
-	private Collection<RedisTestContext> contexts;
+	private Map<RedisServer, RedisTestContext> contexts;
 
 	protected abstract Collection<RedisServer> servers();
 
-	protected Collection<RedisTestContext> getContexts() {
-		return contexts;
+	protected Collection<RedisServer> testServers() {
+		return servers();
+	}
+
+	protected Collection<RedisTestContext> getAllContexts() {
+		return contexts.values();
+	}
+
+	protected Collection<RedisTestContext> getTestContexts() {
+		return testServers().stream().map(contexts::get).collect(Collectors.toList());
 	}
 
 	@BeforeAll
 	protected void setupContexts() {
-		contexts = servers().stream().map(RedisTestContext::new).collect(Collectors.toList());
+		contexts = servers().stream().collect(Collectors.toMap(s -> s, RedisTestContext::new));
 	}
 
 	@BeforeEach
 	protected void flushAll() {
-		contexts.forEach(c -> {
-			c.sync().flushall();
-			Awaitility.await().until(() -> c.sync().dbsize() == 0);
+		contexts.forEach((k, v) -> {
+			v.sync().flushall();
+			Awaitility.await().until(() -> v.sync().dbsize() == 0);
 		});
 	}
 
 	@AfterAll
 	protected void teardownContexts() {
-		contexts.forEach(RedisTestContext::close);
+		contexts.values().forEach(RedisTestContext::close);
+		contexts.clear();
 	}
 
 }

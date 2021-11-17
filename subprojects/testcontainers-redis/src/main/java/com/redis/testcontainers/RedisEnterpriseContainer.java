@@ -17,7 +17,6 @@ import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.TestEnvironment;
 
@@ -220,8 +219,9 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 		return ossCluster;
 	}
 
+	@Override
 	public String toString() {
-		return ClassUtils.getShortClassName(this.getClass());
+		return "RedisEnterpriseContainer " + getRedisURI();
 	}
 
 	@SuppressWarnings("deprecation")

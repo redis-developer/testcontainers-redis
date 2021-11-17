@@ -32,5 +32,7 @@ public class RedisContainer extends AbstractRedisContainer<RedisContainer> {
         withCommand("redis-server", "/data/redis.conf");
         return (C) this;
     }
+    
+    
 
 }
