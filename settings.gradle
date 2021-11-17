@@ -32,7 +32,5 @@ projects {
 }
 
 enforce {
-   
-    enabled = false    
-
+    enabled = false
 }
