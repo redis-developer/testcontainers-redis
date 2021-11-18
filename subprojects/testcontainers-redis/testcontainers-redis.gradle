@@ -4,6 +4,6 @@ dependencies {
 
 eclipse {
     project {
-        name = 'testcontainers-redis'
+        name = 'testcontainers-redis-core'
     }
 }
