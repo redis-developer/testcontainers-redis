@@ -25,6 +25,11 @@ public class RedisTestContext implements AutoCloseable {
 		this.client = client(server);
 	}
 
+	@Override
+	public String toString() {
+		return server.toString();
+	}
+
 	private AbstractRedisClient client(RedisServer server) {
 		if (server.isCluster()) {
 			return RedisModulesClusterClient.create(server.getRedisURI());

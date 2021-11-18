@@ -1,5 +1,4 @@
-/bin/
-/subprojects/testcontainers-redis/bin/
+bin/
 .classpath
 .project
 build
