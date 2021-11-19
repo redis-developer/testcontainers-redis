@@ -16,13 +16,12 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 public class RedisTestContext implements AutoCloseable {
 
 	private final RedisServer server;
-	private final AbstractRedisClient client;
+	private AbstractRedisClient client;
 	private StatefulRedisModulesConnection<String, String> connection;
 	private StatefulRedisPubSubConnection<String, String> pubSubConnection;
 
 	public RedisTestContext(RedisServer server) {
 		this.server = server;
-		this.client = client(server);
 	}
 
 	@Override
@@ -30,18 +29,15 @@ public class RedisTestContext implements AutoCloseable {
 		return server.toString();
 	}
 
-	private AbstractRedisClient client(RedisServer server) {
-		if (server.isCluster()) {
-			return RedisModulesClusterClient.create(server.getRedisURI());
-		}
-		return RedisModulesClient.create(server.getRedisURI());
-	}
-
 	public RedisServer getServer() {
 		return server;
 	}
 
 	public AbstractRedisClient getClient() {
+		if (client == null) {
+			this.client = server.isCluster() ? RedisModulesClusterClient.create(server.getRedisURI())
+					: RedisModulesClient.create(server.getRedisURI());
+		}
 		return client;
 	}
 
@@ -60,17 +56,17 @@ public class RedisTestContext implements AutoCloseable {
 	}
 
 	private StatefulRedisModulesConnection<String, String> connection() {
-		if (client instanceof RedisModulesClusterClient) {
-			return ((RedisModulesClusterClient) client).connect();
+		if (server.isCluster()) {
+			return ((RedisModulesClusterClient) getClient()).connect();
 		}
-		return ((RedisModulesClient) client).connect();
+		return ((RedisModulesClient) getClient()).connect();
 	}
 
 	private StatefulRedisPubSubConnection<String, String> pubSubConnection() {
-		if (client instanceof RedisModulesClusterClient) {
-			return ((RedisModulesClusterClient) client).connectPubSub();
+		if (server.isCluster()) {
+			return ((RedisModulesClusterClient) getClient()).connectPubSub();
 		}
-		return ((RedisModulesClient) client).connectPubSub();
+		return ((RedisModulesClient) getClient()).connectPubSub();
 	}
 
 	public RedisModulesCommands<String, String> sync() {
@@ -93,20 +89,22 @@ public class RedisTestContext implements AutoCloseable {
 		if (connection != null) {
 			connection.close();
 		}
-		client.shutdown();
-		client.getResources().shutdown();
+		if (client != null) {
+			client.shutdown();
+			client.getResources().shutdown();
+		}
 	}
 
 	public RedisClient getRedisClient() {
-		return (RedisClient) client;
+		return (RedisClient) getClient();
 	}
 
 	public RedisClusterClient getRedisClusterClient() {
-		return (RedisClusterClient) client;
+		return (RedisClusterClient) getClient();
 	}
 
 	public boolean isCluster() {
-		return client instanceof RedisClusterClient;
+		return server.isCluster();
 	}
 
 }

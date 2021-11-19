@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.redis.lettucemod.RedisModulesClient;
-import com.redis.lettucemod.Utils;
+import com.redis.lettucemod.RedisModulesUtils;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
-import com.redis.lettucemod.api.search.Field;
-import com.redis.lettucemod.api.search.SearchResults;
 import com.redis.lettucemod.cluster.RedisModulesClusterClient;
 import com.redis.lettucemod.cluster.api.StatefulRedisModulesClusterConnection;
 import com.redis.lettucemod.output.ExecutionResults;
+import com.redis.lettucemod.search.Field;
+import com.redis.lettucemod.search.SearchResults;
 import com.redis.testcontainers.RedisEnterpriseContainer;
 
 import io.lettuce.core.RedisClient;
@@ -97,7 +97,7 @@ class RedisEnterpriseContainerTests {
 	}
 
 	private String load(String resourceName) {
-		return Utils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
+		return RedisModulesUtils.toString(getClass().getClassLoader().getResourceAsStream(resourceName));
 	}
 
 }

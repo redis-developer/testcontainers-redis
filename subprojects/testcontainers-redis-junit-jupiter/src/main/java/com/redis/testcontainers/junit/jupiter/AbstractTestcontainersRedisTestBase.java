@@ -35,6 +35,10 @@ public abstract class AbstractTestcontainersRedisTestBase {
 
 	protected abstract Collection<RedisServer> servers();
 
+	protected RedisTestContext getContext(RedisServer server) {
+		return contexts.get(server);
+	}
+
 	protected Collection<RedisServer> testServers() {
 		return servers();
 	}
