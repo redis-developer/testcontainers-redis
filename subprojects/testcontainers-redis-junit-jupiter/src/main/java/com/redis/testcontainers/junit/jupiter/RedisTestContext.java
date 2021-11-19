@@ -35,15 +35,15 @@ public class RedisTestContext implements AutoCloseable {
 
 	public AbstractRedisClient getClient() {
 		if (client == null) {
-			this.client = server.isCluster() ? RedisModulesClusterClient.create(server.getRedisURI())
-					: RedisModulesClient.create(server.getRedisURI());
+			String uri = server.getRedisURI();
+			client = server.isCluster() ? RedisModulesClusterClient.create(uri) : RedisModulesClient.create(uri);
 		}
 		return client;
 	}
 
 	public StatefulRedisModulesConnection<String, String> getConnection() {
 		if (connection == null) {
-			this.connection = connection();
+			connection = connection();
 		}
 		return connection;
 	}
@@ -85,13 +85,16 @@ public class RedisTestContext implements AutoCloseable {
 	public void close() {
 		if (pubSubConnection != null) {
 			pubSubConnection.close();
+			pubSubConnection = null;
 		}
 		if (connection != null) {
 			connection.close();
+			connection = null;
 		}
 		if (client != null) {
 			client.shutdown();
 			client.getResources().shutdown();
+			client = null;
 		}
 	}
 
