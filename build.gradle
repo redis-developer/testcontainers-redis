@@ -3,23 +3,19 @@ config {
         description = 'Testcontainers Redis'
         inceptionYear = '2020'
         tags = ['spring', 'batch', 'redis']
-
         links {
             website      = "https://github.com/redis-developer/${project.rootProject.name}"
             issueTracker = "https://github.com/redis-developer/${project.rootProject.name}/issues"
             scm          = "https://github.com/redis-developer/${project.rootProject.name}.git"
         }
-
         scm {
             url                 = "https://github.com/redis-developer/${project.rootProject.name}"
             connection          = "scm:git:https://github.com/redis-developer/${project.rootProject.name}.git"
             developerConnection = "scm:git:git@github.com:redis-developer/${project.rootProject.name}.git"
         }
-
         specification {
             enabled = true
         }
-        
         implementation {
             enabled = true
         }
@@ -61,17 +57,22 @@ allprojects {
 }
 
 subprojects {
-
     config {
         info {
             description = project.project_description
         }
     }
-
     test {
         useJUnitPlatform()
     }
-    
+    bootJar {
+        enabled = false
+    }
+    jar {
+        enabled = true
+        archiveClassifier = ''
+    }
+
     sourceCompatibility = 8
     targetCompatibility = 8
 
