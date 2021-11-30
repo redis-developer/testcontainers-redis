@@ -31,6 +31,7 @@ testImplementation "{project-group}:testcontainers-redis-junit-jupiter:{project-
 </dependency>
 ----
 
+== Examples
 
 Redis Standalone and Redis Cluster::
 https://github.com/{tests-path}/RedisTests.java[RedisTests.java]
