@@ -4,73 +4,39 @@
 :project-name:    testcontainers-redis
 :project-group:   com.redis.testcontainers
 :project-version: 1.4.5
-:junit-version: 5.7.2
-:testcontainers-version: 1.15.3
-:sourcedir: subprojects/testcontainers-redis/src/test/java
+:tests-url: https://github.com/redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis-tests/src/test/java/com/redis/testcontainers/test/
 
 image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-group}/{project-name}.svg[Download, link="https://search.maven.org/#search|ga|1|{project-name}"]
 image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/total[GitHub all releases]
 
-Testcontainers Redis is an extension of Testcontainers that supports Redis, Redis Modules, and Redis Enterprise.
+Testcontainers Redis is an extension of Testcontainers that supports Redis (Standalone and Cluster), Redis Modules, and Redis Enterprise containers.
 
 == Getting Started
-
-=== Junit 5
 
 .Gradle
 [source,groovy,subs="+attributes"]
 ----
-testImplementation "org.junit.jupiter:junit-jupiter-api:{junit-version}"
-testImplementation "org.junit.jupiter:junit-jupiter-params:{junit-version}"
-testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:{junit-version}"
-testImplementation "com.redis.testcontainers:testcontainers-redis:{project-version}"
-testImplementation "com.redis.testcontainers:junit-jupiter:{testcontainers-version}"
+testImplementation "{project-group}:testcontainers-redis-junit-jupiter:{project-version}"
 ----
 
 .Maven
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-api</artifactId>
-    <version>{junit-version}</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-params</artifactId>
-    <version>{junit-version}</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-engine</artifactId>
-    <version>{junit-version}</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>com.redis.testcontainers</groupId>
-    <artifactId>testcontainers-redis</artifactId>
+    <groupId>{project-group}</groupId>
+    <artifactId>testcontainers-redis-junit-jupiter</artifactId>
     <version>{project-version}</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>com.redis.testcontainers</groupId>
-    <artifactId>junit-jupiter</artifactId>
-    <version>{testcontainers-version}</version>
     <scope>test</scope>
 </dependency>
 ----
 
-Redis::
-https://github.com/redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis/src/test/java/com/redis/testcontainers/TestRedis.java[TestRedis.java]
 
-Redis Cluster::
-https://github.com/redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis/src/test/java/com/redis/testcontainers/TestRedisCluster.java[TestRedisCluster.java]
+Redis Standalone and Redis Cluster::
+{tests-urls}/RedisTests.java[RedisTests.java]
 
 Redis Modules::
-https://github.com/redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis/src/test/java/com/redis/testcontainers/TestRedisModules.java[TestRedisModules.java]
+{tests-urls}/RedisModulesTests.java[RedisModulesTests.java]
 
 Redis Enterprise::
-https://github.com/redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis/src/test/java/com/redis/testcontainers/TestRedisEnterprise.java[TestRedisEnterprise.java]
+{tests-urls}/RedisEnterpriseTests.java[RedisEnterpriseTests.java]

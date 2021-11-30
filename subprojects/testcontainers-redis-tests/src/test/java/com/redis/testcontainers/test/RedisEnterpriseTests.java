@@ -21,7 +21,7 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 
-class RedisEnterpriseContainerTests {
+class RedisEnterpriseTests {
 
 	@Test
 	void singleShard() {
