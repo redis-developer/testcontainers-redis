@@ -17,7 +17,9 @@ Testcontainers Redis is an extension of Testcontainers that supports Redis (Stan
 .Gradle
 [source,groovy,subs="+attributes"]
 ----
-testImplementation "{project-group}:testcontainers-redis-junit-jupiter:{project-version}"
+dependencies {
+    testImplementation "{project-group}:testcontainers-redis-junit-jupiter:{project-version}"
+}
 ----
 
 .Maven
