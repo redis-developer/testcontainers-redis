@@ -3,7 +3,7 @@
 :project-owner:   redis-developer
 :project-name:    testcontainers-redis
 :project-group:   com.redis.testcontainers
-:project-version: 1.4.5
+:project-version: 1.4.6
 :tests-path: redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis-tests/src/test/java/com/redis/testcontainers/test/
 
 image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
