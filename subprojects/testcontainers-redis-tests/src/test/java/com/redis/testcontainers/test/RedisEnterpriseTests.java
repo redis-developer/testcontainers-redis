@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.utility.DockerImageName;
 
 import com.redis.lettucemod.RedisModulesClient;
 import com.redis.lettucemod.RedisModulesUtils;
@@ -23,9 +24,12 @@ import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 
 class RedisEnterpriseTests {
 
+	private static final DockerImageName IMAGE_NAME = RedisEnterpriseContainer.DEFAULT_IMAGE_NAME
+			.withTag(RedisEnterpriseContainer.DEFAULT_TAG);
+
 	@Test
 	void singleShard() {
-		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer()) {
+		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer(IMAGE_NAME)) {
 			container.start();
 			RedisClient client = RedisClient.create(container.getRedisURI());
 			try (StatefulRedisConnection<String, String> connection = client.connect()) {
@@ -40,7 +44,7 @@ class RedisEnterpriseTests {
 
 	@Test
 	void cluster() {
-		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer()) {
+		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer(IMAGE_NAME)) {
 			container.withShardCount(3);
 			container.withOSSCluster();
 			container.start();
@@ -57,7 +61,7 @@ class RedisEnterpriseTests {
 
 	@Test
 	void searchCluster() {
-		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer()) {
+		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer(IMAGE_NAME)) {
 			container.withShardCount(3);
 			container.withOSSCluster();
 			container.withModules(com.redis.testcontainers.RedisEnterpriseContainer.RedisModule.SEARCH);
@@ -83,7 +87,7 @@ class RedisEnterpriseTests {
 
 	@Test
 	void gears() {
-		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer()) {
+		try (RedisEnterpriseContainer container = new RedisEnterpriseContainer(IMAGE_NAME)) {
 			container.withModules(com.redis.testcontainers.RedisEnterpriseContainer.RedisModule.GEARS);
 			container.start();
 			RedisModulesClient client = RedisModulesClient.create(container.getRedisURI());

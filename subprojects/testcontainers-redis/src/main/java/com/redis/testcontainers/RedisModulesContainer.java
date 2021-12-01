@@ -1,28 +1,37 @@
 package com.redis.testcontainers;
 
-import com.redis.testcontainers.support.AbstractRedisContainer;
 import org.testcontainers.utility.DockerImageName;
+
+import com.redis.testcontainers.support.AbstractRedisContainer;
 
 public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesContainer> {
 
-    private static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redismod");
-    private static final String DEFAULT_TAG = "latest";
+	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redismod");
+	public static final String DEFAULT_TAG = "latest";
 
-    public RedisModulesContainer() {
-        this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
-    }
+	/**
+	 * @deprecated use {@link RedisModulesContainer(DockerImageName)} instead
+	 */
+	@Deprecated
+	public RedisModulesContainer() {
+		this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
+	}
 
-    public RedisModulesContainer(final DockerImageName dockerImageName) {
-        super(dockerImageName);
-    }
+	/**
+	 * @deprecated use {@link RedisModulesContainer(DockerImageName)} instead
+	 */
+	@Deprecated
+	public RedisModulesContainer(final String tag) {
+		this(DEFAULT_IMAGE_NAME.withTag(tag));
+	}
 
-    public RedisModulesContainer(final String tag) {
-        this(DEFAULT_IMAGE_NAME.withTag(tag));
-    }
+	public RedisModulesContainer(final DockerImageName dockerImageName) {
+		super(dockerImageName);
+	}
 
-    @Override
-    public boolean isCluster() {
-        return false;
-    }
+	@Override
+	public boolean isCluster() {
+		return false;
+	}
 
 }

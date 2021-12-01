@@ -27,9 +27,12 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 class RedisTests extends AbstractTestcontainersRedisTestBase {
 
 	@Container
-	static final RedisContainer REDIS = new RedisContainer().withKeyspaceNotifications();
+	private static final RedisContainer REDIS = new RedisContainer(
+			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications();
 	@Container
-	static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer().withKeyspaceNotifications();
+	private static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer(
+			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
+					.withKeyspaceNotifications();
 
 	@Override
 	protected Collection<RedisServer> servers() {

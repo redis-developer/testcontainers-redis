@@ -6,33 +6,40 @@ import org.testcontainers.utility.MountableFile;
 
 public class RedisContainer extends AbstractRedisContainer<RedisContainer> {
 
-    private static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redis");
-    private static final String DEFAULT_TAG = "latest";
+	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redis");
+	public static final String DEFAULT_TAG = "6.2.6";
 
-    public RedisContainer() {
-        this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
-    }
+	/**
+	 * @deprecated use {@link RedisContainer(DockerImageName)} instead
+	 */
+	@Deprecated
+	public RedisContainer() {
+		this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
+	}
 
-    public RedisContainer(final DockerImageName dockerImageName) {
-        super(dockerImageName);
-    }
+	public RedisContainer(final DockerImageName dockerImageName) {
+		super(dockerImageName);
+	}
 
-    public RedisContainer(final String tag) {
-        this(DEFAULT_IMAGE_NAME.withTag(tag));
-    }
+	/**
+	 * @deprecated use {@link RedisContainer(DockerImageName)} instead
+	 */
+	@Deprecated
+	public RedisContainer(final String tag) {
+		this(DEFAULT_IMAGE_NAME.withTag(tag));
+	}
 
-    @Override
-    public boolean isCluster() {
-        return false;
-    }
+	@Override
+	public boolean isCluster() {
+		return false;
+	}
 
-    @SuppressWarnings("unchecked")
-    public <C extends RedisContainer> C withKeyspaceNotifications() {
-        withCopyFileToContainer(MountableFile.forClasspathResource("redis-keyspace-notifications.conf"), "/data/redis.conf");
-        withCommand("redis-server", "/data/redis.conf");
-        return (C) this;
-    }
-    
-    
+	@SuppressWarnings("unchecked")
+	public <C extends RedisContainer> C withKeyspaceNotifications() {
+		withCopyFileToContainer(MountableFile.forClasspathResource("redis-keyspace-notifications.conf"),
+				"/data/redis.conf");
+		withCommand("redis-server", "/data/redis.conf");
+		return (C) this;
+	}
 
 }

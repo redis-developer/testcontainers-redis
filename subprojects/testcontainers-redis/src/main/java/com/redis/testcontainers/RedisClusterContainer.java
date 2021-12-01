@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.DockerImageName;
 
 public class RedisClusterContainer extends GenericContainer<RedisClusterContainer> implements RedisServer {
 
@@ -12,22 +13,27 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 	private static final String ENV_INITIAL_PORT = "INITIAL_PORT";
 	private static final String ENV_IP = "IP";
 
-	private static final String DEFAULT_IMAGE_NAME = "grokzen/redis-cluster:6.2.1";
+	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("grokzen/redis-cluster");
+	public static final String DEFAULT_TAG = "6.2.1";
 	private static final String KEYSPACE_NOTIFICATIONS_IMAGE_NAME = "jruaux/redis-cluster:6.2.1";
-	private static final int DEFAULT_INITIAL_PORT = 7000;
-	private static final int DEFAULT_MASTERS = 3;
-	private static final int DEFAULT_SLAVES_PER_MASTER = 0;
-	private static final String DEFAULT_IP = "0.0.0.0";
+	public static final int DEFAULT_INITIAL_PORT = 7000;
+	public static final int DEFAULT_MASTERS = 3;
+	public static final int DEFAULT_SLAVES_PER_MASTER = 0;
+	public static final String DEFAULT_IP = "0.0.0.0";
 
 	private int initialPort = DEFAULT_INITIAL_PORT;
 	private int masters = DEFAULT_MASTERS;
 	private int slavesPerMaster = DEFAULT_SLAVES_PER_MASTER;
 
+	/**
+	 * @deprecated use {@link RedisClusterContainer(DockerImageName)} instead
+	 */
+	@Deprecated
 	public RedisClusterContainer() {
-		this(DEFAULT_IMAGE_NAME);
+		this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
 	}
 
-	protected RedisClusterContainer(final String dockerImageName) {
+	public RedisClusterContainer(DockerImageName dockerImageName) {
 		super(dockerImageName);
 		withIP(DEFAULT_IP);
 		update();

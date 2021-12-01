@@ -110,4 +110,7 @@ public class RedisTestContext implements AutoCloseable {
 		return server.isCluster();
 	}
 
+	public String getRedisURI() {
+		return server.getRedisURI();
+	}
 }

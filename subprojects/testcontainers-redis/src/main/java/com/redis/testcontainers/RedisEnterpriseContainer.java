@@ -55,7 +55,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	public static final String ADMIN_USERNAME = "testcontainers@redis.com";
 	public static final String ADMIN_PASSWORD = "redis123";
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
-	public static final String DEFAULT_TAG = "latest";
+	public static final String DEFAULT_TAG = "6.2.8-50";
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
 	private static final int DEFAULT_SHARD_COUNT = 2;
 	private static final String DEFAULT_DATABASE_NAME = "testcontainers";
@@ -77,8 +77,20 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	private Duration clusterCreateRetryDelay = DEFAULT_CLUSTER_CREATE_RETRY_DELAY;
 	private Set<RedisModule> modules = new HashSet<>();
 
+	/**
+	 * @deprecated use {@link RedisEnterpriseContainer(DockerImageName)} instead
+	 */
+	@Deprecated
 	public RedisEnterpriseContainer() {
 		this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
+	}
+
+	/**
+	 * @deprecated use {@link RedisEnterpriseContainer(DockerImageName)} instead
+	 */
+	@Deprecated
+	public RedisEnterpriseContainer(final String tag) {
+		this(DEFAULT_IMAGE_NAME.withTag(tag));
 	}
 
 	public RedisEnterpriseContainer(final DockerImageName dockerImageName) {
@@ -91,10 +103,6 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 		waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n",
 				1));
 
-	}
-
-	public RedisEnterpriseContainer(final String tag) {
-		this(DEFAULT_IMAGE_NAME.withTag(tag));
 	}
 
 	public RedisEnterpriseContainer withBootstrapTimeout(Duration timeout) {

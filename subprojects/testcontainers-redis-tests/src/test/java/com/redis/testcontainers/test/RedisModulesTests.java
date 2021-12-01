@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 import com.redis.lettucemod.RedisModulesClient;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
@@ -24,11 +25,12 @@ import com.redis.testcontainers.junit.jupiter.RedisTestContextsSource;
 class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
 	@Container
-	static final RedisModulesContainer REDIS = new RedisModulesContainer();
+	private static final RedisModulesContainer REDISMOD = new RedisModulesContainer(
+			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
 
 	@Override
 	protected Collection<RedisServer> servers() {
-		return Arrays.asList(REDIS);
+		return Arrays.asList(REDISMOD);
 	}
 
 	@ParameterizedTest
@@ -67,7 +69,8 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
 	@Test
 	void previewTag() {
-		try (RedisModulesContainer container = new RedisModulesContainer("preview")) {
+		DockerImageName previewImageName = RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview");
+		try (RedisModulesContainer container = new RedisModulesContainer(previewImageName)) {
 			container.start();
 			RedisModulesClient client = RedisModulesClient.create(container.getRedisURI());
 			StatefulRedisModulesConnection<String, String> connection = client.connect();
