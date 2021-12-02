@@ -9,8 +9,6 @@ import com.redis.lettucemod.cluster.RedisModulesClusterClient;
 import com.redis.testcontainers.RedisServer;
 
 import io.lettuce.core.AbstractRedisClient;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 public class RedisTestContext implements AutoCloseable {
@@ -98,12 +96,12 @@ public class RedisTestContext implements AutoCloseable {
 		}
 	}
 
-	public RedisClient getRedisClient() {
-		return (RedisClient) getClient();
+	public RedisModulesClient getRedisClient() {
+		return (RedisModulesClient) getClient();
 	}
 
-	public RedisClusterClient getRedisClusterClient() {
-		return (RedisClusterClient) getClient();
+	public RedisModulesClusterClient getRedisClusterClient() {
+		return (RedisModulesClusterClient) getClient();
 	}
 
 	public boolean isCluster() {
