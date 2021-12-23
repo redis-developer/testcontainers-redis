@@ -2,8 +2,6 @@ package com.redis.testcontainers;
 
 import org.testcontainers.utility.DockerImageName;
 
-import com.redis.testcontainers.support.AbstractRedisContainer;
-
 public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesContainer> {
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redismod");

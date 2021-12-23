@@ -1,11 +1,11 @@
 package com.redis.testcontainers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -23,32 +23,15 @@ import org.testcontainers.utility.TestEnvironment;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.command.InspectExecResponse;
 import com.github.dockerjava.api.exception.DockerException;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
-import com.redis.testcontainers.support.RetryCallable;
-import com.redis.testcontainers.support.enterprise.Provisioner;
-import com.redis.testcontainers.support.enterprise.RestAPI;
-import com.redis.testcontainers.support.enterprise.rest.Bootstrap;
-import com.redis.testcontainers.support.enterprise.rest.DatabaseCreateRequest;
-import com.redis.testcontainers.support.enterprise.rest.DatabaseCreateResponse;
+import com.redis.enterprise.Admin;
+import com.redis.enterprise.Database;
+import com.redis.enterprise.Database.ModuleConfig;
+import com.redis.enterprise.RedisModule;
+import com.redis.enterprise.rest.InstalledModule;
 
 public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseContainer> implements RedisServer {
-
-	public enum RedisModule {
-
-		BLOOM("bf"), GEARS("rg"), GRAPH("graph"), JSON("ReJSON"), SEARCH("search"), TIMESERIES("timeseries");
-
-		private final String name;
-
-		RedisModule(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-	}
 
 	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
 
@@ -56,26 +39,18 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	public static final String ADMIN_PASSWORD = "redis123";
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
 	public static final String DEFAULT_TAG = "6.2.8-50";
+	public static final int ADMIN_PORT = 8443;
+	public static final int DEFAULT_DATABASE_PORT = 12000;
+	public static final String GEARS_MODULE_FILE = "redisgears.linux-bionic-x64.1.0.6.zip";
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
 	private static final int DEFAULT_SHARD_COUNT = 2;
 	private static final String DEFAULT_DATABASE_NAME = "testcontainers";
 	private static final String RLADMIN = "/opt/redislabs/bin/rladmin";
-	private static final Duration DEFAULT_BOOTSTRAP_TIMEOUT = Duration.ofSeconds(30);
-	private static final Duration DEFAULT_BOOTSTRAP_RETRY_DELAY = Duration.ofSeconds(3);
-	private static final Duration DEFAULT_CLUSTER_CREATE_TIMEOUT = Duration.ofSeconds(10);
-	private static final Duration DEFAULT_CLUSTER_CREATE_RETRY_DELAY = Duration.ofSeconds(3);
-	public static final int ADMIN_PORT = 8443;
-	public static final int ENDPOINT_PORT = 12000;
 
-	private Provisioner provisioner = new Provisioner();
-	private String databaseName = DEFAULT_DATABASE_NAME;
-	private int shardCount = DEFAULT_SHARD_COUNT;
-	private boolean ossCluster;
-	private Duration bootstrapTimeout = DEFAULT_BOOTSTRAP_TIMEOUT;
-	private Duration bootstrapRetryDelay = DEFAULT_BOOTSTRAP_RETRY_DELAY;
-	private Duration clusterCreateTimeout = DEFAULT_CLUSTER_CREATE_TIMEOUT;
-	private Duration clusterCreateRetryDelay = DEFAULT_CLUSTER_CREATE_RETRY_DELAY;
-	private Set<RedisModule> modules = new HashSet<>();
+	private static final Long EXIT_CODE_SUCCESS = 0L;
+
+	private Database database = Database.name(DEFAULT_DATABASE_NAME).shardCount(DEFAULT_SHARD_COUNT)
+			.port(DEFAULT_DATABASE_PORT).build();
 
 	/**
 	 * @deprecated use {@link RedisEnterpriseContainer(DockerImageName)} instead
@@ -95,146 +70,47 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 	public RedisEnterpriseContainer(final DockerImageName dockerImageName) {
 		super(dockerImageName);
-		addFixedExposedPort(RestAPI.DEFAULT_PORT, RestAPI.DEFAULT_PORT);
+		addFixedExposedPort(Admin.DEFAULT_PORT, Admin.DEFAULT_PORT);
 		addFixedExposedPort(ADMIN_PORT, ADMIN_PORT);
-		addFixedExposedPort(ENDPOINT_PORT, ENDPOINT_PORT);
+		addFixedExposedPort(database.getPort(), database.getPort());
 		withPrivilegedMode(true);
 		withPublishAllPorts(false);
 		waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n",
 				1));
-
 	}
 
-	public RedisEnterpriseContainer withBootstrapTimeout(Duration timeout) {
-		this.bootstrapTimeout = timeout;
-		return this;
+	public Database getDatabase() {
+		return database;
 	}
 
-	public RedisEnterpriseContainer withBootstrapRetryDelay(Duration retryDelay) {
-		this.bootstrapRetryDelay = retryDelay;
-		return this;
-	}
-
-	public RedisEnterpriseContainer withClusterCreateTimeout(Duration timeout) {
-		this.clusterCreateTimeout = timeout;
-		return this;
-	}
-
-	public RedisEnterpriseContainer withClusterCreateRetryDelay(Duration retryDelay) {
-		this.clusterCreateRetryDelay = retryDelay;
-		return this;
-	}
-
-	public RedisEnterpriseContainer withProvisioner(Provisioner provisioner) {
-		this.provisioner = provisioner;
-		return this;
-	}
-
-	public RedisEnterpriseContainer withShardCount(int shardCount) {
-		this.shardCount = shardCount;
-		return this;
-	}
-
-	public RedisEnterpriseContainer withModule(RedisModule module) {
-		this.modules.add(module);
-		return this;
-	}
-
-	public RedisEnterpriseContainer withModules(RedisModule... modules) {
-		this.modules.addAll(Arrays.asList(modules));
-		return this;
-	}
-
-	public RedisEnterpriseContainer withDatabaseName(String name) {
-		this.databaseName = name;
-		return this;
-	}
-
-	public RedisEnterpriseContainer withOSSCluster() {
-		this.ossCluster = true;
+	public RedisEnterpriseContainer withDatabase(Database database) {
+		this.database = database;
+		if (database.getPort() == null) {
+			database.setPort(DEFAULT_DATABASE_PORT);
+		}
 		return this;
 	}
 
 	@Override
 	protected void containerIsStarted(InspectContainerResponse containerInfo) {
 		super.containerIsStarted(containerInfo);
-		RestAPI restAPI = new RestAPI();
-		restAPI.withHost(getHost());
-		try {
-			waitForBootstrap(restAPI);
-		} catch (Exception e) {
-			throw new RuntimeException("Error while waiting for bootstrap", e);
-		}
-		String username = ADMIN_USERNAME;
-		String password = ADMIN_PASSWORD;
-		String externalAddress = NODE_EXTERNAL_ADDR;
-		log.info("Creating cluster with username={}, password={}, external_adr={}", username, password,
-				externalAddress);
-		createCluster(username, password, externalAddress);
-		String host = getHost();
-		log.info("Creating REST API client with username={}, password={}, host={}", username, password, host);
-		restAPI.withCredentials(new UsernamePasswordCredentials(username, password.toCharArray()));
-		provisioner.withRestAPI(restAPI);
-		DatabaseCreateRequest database = new DatabaseCreateRequest();
-		database.setName(databaseName);
-		database.setPort(ENDPOINT_PORT);
-		database.setShardCount(shardCount);
-		database.setOssCluster(ossCluster);
-		database.setModules(modules.stream().map(RedisModule::getName).collect(Collectors.toList()));
-		DatabaseCreateResponse response;
-		try {
-			response = provisioner.create(database);
-		} catch (Exception e) {
-			throw new RuntimeException("Could not provision database", e);
-		}
-		log.info("Created database {} with UID {}", database.getName(), response.getUid());
-	}
-
-	private void waitForBootstrap(RestAPI restAPI) throws Exception {
-		RetryCallable<Bootstrap> callable = RetryCallable.delegate(() -> {
-			log.info("Checking bootstrap status");
-			Bootstrap bootstrap = restAPI.bootstrap();
-			if ("idle".equals(bootstrap.getStatus().getState())) {
-				return bootstrap;
+		try (Admin admin = new Admin(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())) {
+			admin.setHost(getHost());
+			log.info("Waiting for cluster bootstrap");
+			admin.waitForBoostrap();
+			createCluster();
+			if (!database.getModules().isEmpty()) {
+				installModules(admin, database.getModules());
 			}
-			throw new ContainerLaunchException("Timed out waiting for bootstrap");
-		}).sleep(bootstrapRetryDelay).timeout(bootstrapTimeout);
-		callable.call();
-	}
-
-	private void createCluster(String username, String password, String externalAddress) {
-		try {
-			RetryCallable.delegate(() -> {
-				ExecResult result = execute(RLADMIN, "cluster", "create", "name", "cluster.local", "username", username,
-						"password", password, "external_addr", externalAddress);
-				if (result.getExitCode() == 0) {
-					return result;
-				}
-				throw new Exception("Failed to create cluster: " + result.getStderr() + " " + result.getStdout());
-			}).sleep(clusterCreateRetryDelay).timeout(clusterCreateTimeout).call();
+			Database response = admin.createDatabase(database);
+			log.info("Created database {} with UID {}", response.getName(), response.getUid());
 		} catch (Exception e) {
-			throw new ContainerLaunchException("Could not create Redis Enterprise cluster", e);
+			throw new ContainerLaunchException("Could not initialize Redis Enterprise container", e);
 		}
 	}
 
-	@Override
-	public String getRedisURI() {
-		return RedisServer.redisURI(getHost(), ENDPOINT_PORT);
-	}
-
-	@Override
-	public boolean isCluster() {
-		return ossCluster;
-	}
-
-	@Override
-	public String toString() {
-		return "RedisEnterpriseContainer " + getRedisURI();
-	}
-
-	@SuppressWarnings("deprecation")
-	public ExecResult execute(String... command)
-			throws UnsupportedOperationException, IOException, InterruptedException {
+	private void createCluster() {
+		log.info("Creating cluster");
 		if (!TestEnvironment.dockerExecutionDriverSupportsExec()) {
 			// at time of writing, this is the expected result in CircleCI.
 			throw new UnsupportedOperationException(
@@ -251,9 +127,11 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 		DockerClient dockerClient = DockerClientFactory.instance().client();
 
-		log.debug("{}: Running \"exec\" command: {}", containerName, String.join(" ", command));
+		String[] commands = new String[] { RLADMIN, "cluster", "create", "name", "cluster.local", "username",
+				ADMIN_USERNAME, "password", ADMIN_PASSWORD, "external_addr", NODE_EXTERNAL_ADDR };
+		log.debug("{}: Running \"exec\" command: {}", containerName, commands);
 		final ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
-				.withAttachStdout(true).withAttachStderr(true).withCmd(command).withPrivileged(true).exec();
+				.withAttachStdout(true).withAttachStderr(true).withCmd(commands).withPrivileged(true).exec();
 
 		final ToStringConsumer stdoutConsumer = new ToStringConsumer();
 		final ToStringConsumer stderrConsumer = new ToStringConsumer();
@@ -261,56 +139,57 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 		try (FrameConsumerResultCallback callback = new FrameConsumerResultCallback()) {
 			callback.addConsumer(OutputFrame.OutputType.STDOUT, stdoutConsumer);
 			callback.addConsumer(OutputFrame.OutputType.STDERR, stderrConsumer);
-
 			dockerClient.execStartCmd(execCreateCmdResponse.getId()).exec(callback).awaitCompletion();
+			InspectExecResponse execResponse = dockerClient.inspectExecCmd(execCreateCmdResponse.getId()).exec();
+			if (EXIT_CODE_SUCCESS.equals(execResponse.getExitCodeLong())) {
+				return;
+			}
+			if (log.isErrorEnabled()) {
+				log.error("Could not create cluster: {}", stderrConsumer.toString(StandardCharsets.UTF_8));
+			}
+			throw new ContainerLaunchException("Could not create cluster");
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new ContainerLaunchException("Could not create cluster", e);
+		} catch (IOException e) {
+			log.error("Could not close result callback", e);
 		}
-		Integer exitCode = dockerClient.inspectExecCmd(execCreateCmdResponse.getId()).exec().getExitCode();
-
-		final ExecResult result = new ExecResult(exitCode, stdoutConsumer.toString(StandardCharsets.UTF_8),
-				stderrConsumer.toString(StandardCharsets.UTF_8));
-
-		log.trace("{}: stdout: {}", containerName, result.getStdout());
-		log.trace("{}: stderr: {}", containerName, result.getStderr());
-		return result;
 	}
 
-	static class ExecResult {
-
-		int exitCode;
-		String stdout;
-		String stderr;
-
-		public ExecResult(int exitCode, String stdout, String stderr) {
-			super();
-			this.exitCode = exitCode;
-			this.stdout = stdout;
-			this.stderr = stderr;
+	private static void installModules(Admin admin, List<ModuleConfig> modules) throws IOException {
+		Map<String, InstalledModule> installedModules = admin.getModules().stream()
+				.collect(Collectors.toMap(InstalledModule::getName, m -> m));
+		for (ModuleConfig moduleConfig : modules) {
+			if (installedModules.containsKey(moduleConfig.getName())) {
+				continue;
+			}
+			if (RedisModule.GEARS.getModuleName().equals(moduleConfig.getName())) {
+				try (InputStream inputStream = RedisEnterpriseContainer.class.getClassLoader()
+						.getResourceAsStream(GEARS_MODULE_FILE)) {
+					admin.installModule(GEARS_MODULE_FILE, inputStream);
+				} catch (Exception e) {
+					throw new ContainerLaunchException(
+							String.format("Could not install module %s", moduleConfig.getName()), e);
+				}
+			} else {
+				log.error("Could not find any module named '{}' on Redis Enterprise cluster", moduleConfig.getName());
+			}
 		}
+	}
 
-		public int getExitCode() {
-			return exitCode;
-		}
+	@Override
+	public String getRedisURI() {
+		return RedisServer.redisURI(getHost(), database.getPort());
+	}
 
-		public void setExitCode(int exitCode) {
-			this.exitCode = exitCode;
-		}
+	@Override
+	public boolean isCluster() {
+		return database.isOssCluster();
+	}
 
-		public String getStdout() {
-			return stdout;
-		}
-
-		public void setStdout(String stdout) {
-			this.stdout = stdout;
-		}
-
-		public String getStderr() {
-			return stderr;
-		}
-
-		public void setStderr(String stderr) {
-			this.stderr = stderr;
-		}
-
+	@Override
+	public String toString() {
+		return "RedisEnterpriseContainer " + getRedisURI();
 	}
 
 	private boolean isRunning(InspectContainerResponse containerInfo) {
@@ -319,6 +198,26 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 		} catch (DockerException e) {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(database);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RedisEnterpriseContainer other = (RedisEnterpriseContainer) obj;
+		return Objects.equals(database, other.database);
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.redis.testcontainers;
 
-import com.redis.testcontainers.support.AbstractRedisContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
