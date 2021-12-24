@@ -36,17 +36,28 @@ class RedisTests extends AbstractTestcontainersRedisTestBase {
 	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG));
 
+	/**
+	 * List of Redis servers that tests will be run against
+	 */
 	@Override
 	protected Collection<RedisServer> servers() {
 		return Arrays.asList(REDIS, REDIS_CLUSTER, REDIS_MOD, REDIS_MOD_PREVIEW, REDIS_ENTERPRISE);
 	}
 
+	/**
+	 * Assert that the Redis server can be pinged
+	 * @param context test context, including the Redis server to test against
+	 */
 	@ParameterizedTest
 	@RedisTestContextsSource
 	void canPing(RedisTestContext context) {
 		Assertions.assertEquals("PONG", context.sync().ping());
 	}
 
+	/**
+	 * Assert that the Redis server can be written to
+	 * @param context test context, including the Redis server to test against
+	 */
 	@ParameterizedTest
 	@RedisTestContextsSource
 	void canWrite(RedisTestContext context) {

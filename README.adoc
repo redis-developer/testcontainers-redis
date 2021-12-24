@@ -4,7 +4,7 @@
 :project-name:    testcontainers-redis
 :project-group:   com.redis.testcontainers
 :project-version: 1.4.6
-:tests-path: redis-developer/testcontainers-redis/blob/master/subprojects/testcontainers-redis-tests/src/test/java/com/redis/testcontainers/test/
+:project-path: redis-developer/testcontainers-redis/blob/master/subprojects
 
 image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-group}/{project-name}.svg[Download, link="https://search.maven.org/#search|ga|1|{project-name}"]
@@ -18,7 +18,7 @@ Testcontainers Redis is an extension of Testcontainers that supports Redis (Stan
 [source,groovy,subs="+attributes"]
 ----
 dependencies {
-    testImplementation "{project-group}:testcontainers-redis-junit-jupiter:{project-version}"
+    testImplementation "{project-group}:testcontainers-redis-junit:{project-version}"
 }
 ----
 
@@ -27,19 +27,16 @@ dependencies {
 ----
 <dependency>
     <groupId>{project-group}</groupId>
-    <artifactId>testcontainers-redis-junit-jupiter</artifactId>
+    <artifactId>testcontainers-redis-junit</artifactId>
     <version>{project-version}</version>
     <scope>test</scope>
 </dependency>
 ----
 
-== Examples
+== Usage
 
-Redis Standalone and Redis Cluster::
-https://github.com/{tests-path}/RedisTests.java[RedisTests.java]
+Redis::
+https://github.com/redis-developer/testcontainers-redis/tree/master/subprojects/testcontainers-redis-junit/src/test/java/com/redis/testcontainers/junit/RedisTests.java[RedisTests.java]
 
 Redis Modules::
-https://github.com/{tests-path}/RedisModulesTests.java[RedisModulesTests.java]
-
-Redis Enterprise::
-https://github.com/{tests-path}/RedisEnterpriseTests.java[RedisEnterpriseTests.java]
+https://github.com/redis-developer/testcontainers-redis/tree/master/subprojects/testcontainers-redis-junit/src/test/java/com/redis/testcontainers/junit/RedisModulesTests.java[RedisModulesTests.java]
