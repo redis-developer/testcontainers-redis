@@ -21,17 +21,17 @@ import com.redis.testcontainers.RedisServer;
 
 class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
-	private final RedisModulesContainer redisMod = new RedisModulesContainer(
-			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
-	private final RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
-			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
-					.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
-							.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
-
+	@SuppressWarnings("resource")
 	@Override
 	protected Collection<RedisServer> redisServers() {
-		return Arrays.asList(redisMod, redisEnterprise);
-
+		return Arrays.asList(
+				new RedisModulesContainer(
+						RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG)),
+				new RedisEnterpriseContainer(
+						RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
+								.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
+										.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES)
+										.build()));
 	}
 
 	@ParameterizedTest

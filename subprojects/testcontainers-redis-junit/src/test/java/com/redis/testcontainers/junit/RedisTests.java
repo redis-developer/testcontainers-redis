@@ -16,25 +16,24 @@ import com.redis.testcontainers.RedisServer;
 
 class RedisTests extends AbstractTestcontainersRedisTestBase {
 
-	private final RedisContainer redis = new RedisContainer(
-			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications();
-	private final RedisModulesContainer redisMod = new RedisModulesContainer(
-			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
-	private final RedisModulesContainer redisModPreview = new RedisModulesContainer(
-			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview"));
-	private final RedisClusterContainer redisCluster = new RedisClusterContainer(
-			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
-					.withKeyspaceNotifications();
-	private final RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
-			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG));
-
 	/**
 	 * 
 	 * @return Redis containers required for the tests
 	 */
+	@SuppressWarnings("resource")
 	@Override
 	protected Collection<RedisServer> redisServers() {
-		return Arrays.asList(redis, redisMod, redisModPreview, redisCluster, redisEnterprise);
+		return Arrays.asList(
+				new RedisContainer(RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG))
+						.withKeyspaceNotifications(),
+				new RedisModulesContainer(
+						RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG)),
+				new RedisModulesContainer(RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview")),
+				new RedisClusterContainer(
+						RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
+								.withKeyspaceNotifications(),
+				new RedisEnterpriseContainer(
+						RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG)));
 	}
 
 	/**
