@@ -76,8 +76,10 @@ public abstract class AbstractTestcontainersRedisTestBase {
 
 	@AfterAll
 	protected void teardown() {
-		contexts.values().forEach(RedisTestContext::close);
-		contexts.keySet().forEach(RedisServer::close);
+		contexts.forEach((k, v) -> {
+			v.close();
+			k.close();
+		});
 		contexts.clear();
 	}
 
