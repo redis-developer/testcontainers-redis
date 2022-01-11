@@ -53,6 +53,14 @@ public abstract class AbstractTestcontainersRedisTestBase {
 		}
 	}
 
+	protected RedisTestContext removeRedisTestContext(RedisServer server) {
+		return contexts.remove(server);
+	}
+
+	public RedisTestContext getRedisTestContext(RedisServer server) {
+		return contexts.get(server);
+	}
+
 	protected Collection<RedisTestContext> getRedisTestContexts() {
 		return contexts.values();
 	}
