@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import io.lettuce.core.RedisClient;
@@ -16,26 +16,29 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 @Testcontainers
 class RedisContainerTests {
 
-	@Container
-	private static final RedisContainer REDIS = new RedisContainer(
-			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications();
-
+	@SuppressWarnings("resource")
 	@Test
 	void emitsKeyspaceNotifications() throws InterruptedException {
-		RedisClient client = RedisClient.create(REDIS.getRedisURI());
-		String keyPattern = "__keyspace@0__:*";
-		List<String> messages = new ArrayList<>();
-		try (StatefulRedisConnection<String, String> connection = client.connect();
-				StatefulRedisPubSubConnection<String, String> pubSubConnection = client.connectPubSub()) {
-			pubSubConnection.addListener(new PubSubListener(messages));
-			pubSubConnection.sync().psubscribe(keyPattern);
-			Thread.sleep(10);
-			connection.sync().set("key1", "value");
-			connection.sync().set("key2", "value");
-			Thread.sleep(10);
+		try (RedisContainer redis = new RedisContainer(
+				RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications()) {
+			Assumptions.assumeTrue(redis.isActive());
+			redis.start();
+			RedisClient client = RedisClient.create(redis.getRedisURI());
+			List<String> messages = new ArrayList<>();
+			try (StatefulRedisConnection<String, String> connection = client.connect();
+					StatefulRedisPubSubConnection<String, String> pubSubConnection = client.connectPubSub()) {
+				pubSubConnection.addListener(new PubSubListener(messages));
+				pubSubConnection.sync().psubscribe("__keyspace@0__:*");
+				Thread.sleep(10);
+				connection.sync().set("key1", "value");
+				connection.sync().set("key2", "value");
+				Thread.sleep(10);
+			} finally {
+				client.shutdown();
+				client.getResources().shutdown();
+			}
+			Assertions.assertEquals(2, messages.size());
 		}
-		Assertions.assertEquals(2, messages.size());
-
 	}
 
 	private static class PubSubListener extends RedisPubSubAdapter<String, String> {

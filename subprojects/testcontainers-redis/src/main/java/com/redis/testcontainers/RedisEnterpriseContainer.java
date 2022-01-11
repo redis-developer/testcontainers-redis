@@ -42,6 +42,8 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	public static final int ADMIN_PORT = 8443;
 	public static final int DEFAULT_DATABASE_PORT = 12000;
 	public static final String GEARS_MODULE_FILE = "redisgears.linux-bionic-x64.1.0.6.zip";
+	public static final String ENV_SKIP_TESTS = "skipRedisEnterpriseTests";
+
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
 	private static final int DEFAULT_SHARD_COUNT = 2;
 	private static final String DEFAULT_DATABASE_NAME = "testcontainers";
@@ -218,6 +220,11 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 			return false;
 		RedisEnterpriseContainer other = (RedisEnterpriseContainer) obj;
 		return Objects.equals(database, other.database);
+	}
+
+	@Override
+	public boolean isActive() {
+		return System.getenv(ENV_SKIP_TESTS) == null;
 	}
 
 }

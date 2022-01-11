@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.junit.jupiter.Container;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import io.lettuce.core.cluster.RedisClusterClient;
@@ -17,29 +19,36 @@ import io.lettuce.core.cluster.pubsub.StatefulRedisClusterPubSubConnection;
 @Testcontainers
 class RedisClusterContainerTests {
 
-	@Container
-	private static final RedisClusterContainer REDIS = new RedisClusterContainer(
-			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
-					.withKeyspaceNotifications();
+	private static final Logger log = LoggerFactory.getLogger(RedisClusterContainerTests.class);
 
+	@SuppressWarnings("resource")
 	@Test
-	void emitsKeyspaceNotifications() throws InterruptedException {
-		String keyPattern = "__keyspace@0__:*";
-		List<String> messages = new ArrayList<>();
-		RedisClusterClient client = RedisClusterClient.create(REDIS.getRedisURI());
-		try (StatefulRedisClusterConnection<String, String> connection = client.connect();
-				StatefulRedisClusterPubSubConnection<String, String> pubSubConnection = client.connectPubSub()) {
-			pubSubConnection.addListener(new ClusterPubSubListener(messages));
-			pubSubConnection.setNodeMessagePropagation(true);
-			pubSubConnection.sync().upstream().commands().psubscribe(keyPattern);
-			Thread.sleep(10);
-			connection.sync().set("key1", "value");
-			connection.sync().set("key2", "value");
-			Thread.sleep(10);
-			Assertions.assertEquals(2, messages.size());
+	void emitsKeyspaceNotifications() throws Exception {
+		log.info("Creating RedisCluster container: {}={}", RedisClusterContainer.ENV_SKIP_TESTS,
+				System.getenv(RedisClusterContainer.ENV_SKIP_TESTS));
+		try (RedisClusterContainer redisCluster = new RedisClusterContainer(
+				RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
+						.withKeyspaceNotifications()) {
+			Assumptions.assumeTrue(redisCluster.isActive());
+			log.info("Starting container {}", redisCluster);
+			redisCluster.start();
+			List<String> messages = new ArrayList<>();
+			RedisClusterClient client = RedisClusterClient.create(redisCluster.getRedisURI());
+			try (StatefulRedisClusterConnection<String, String> connection = client.connect();
+					StatefulRedisClusterPubSubConnection<String, String> pubSubConnection = client.connectPubSub()) {
+				pubSubConnection.addListener(new ClusterPubSubListener(messages));
+				pubSubConnection.setNodeMessagePropagation(true);
+				pubSubConnection.sync().upstream().commands().psubscribe("__keyspace@0__:*");
+				Thread.sleep(10);
+				connection.sync().set("key1", "value");
+				connection.sync().set("key2", "value");
+				Thread.sleep(10);
+				Assertions.assertEquals(2, messages.size());
+			} finally {
+				client.shutdown();
+				client.getResources().shutdown();
+			}
 		}
-		client.shutdown();
-		client.getResources().shutdown();
 	}
 
 	private static class ClusterPubSubListener extends RedisClusterPubSubAdapter<String, String> {

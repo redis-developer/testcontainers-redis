@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.testcontainers.junit.jupiter.Container;
 
 import com.redis.enterprise.Database;
 import com.redis.enterprise.RedisModule;
@@ -22,19 +21,17 @@ import com.redis.testcontainers.RedisServer;
 
 class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
-	@Container
-	private static final RedisModulesContainer REDIS_MOD = new RedisModulesContainer(
+	private RedisModulesContainer redisMod = new RedisModulesContainer(
 			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
-
-	@Container
-	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
+	private RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
 					.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
 							.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
 
 	@Override
-	protected Collection<RedisServer> servers() {
-		return Arrays.asList(REDIS_MOD, REDIS_ENTERPRISE);
+	protected Collection<RedisServer> redisServers() {
+		return Arrays.asList(redisMod, redisEnterprise);
+
 	}
 
 	@ParameterizedTest

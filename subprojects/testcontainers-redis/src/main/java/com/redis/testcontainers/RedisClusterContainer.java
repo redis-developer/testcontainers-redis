@@ -8,18 +8,19 @@ import org.testcontainers.utility.DockerImageName;
 
 public class RedisClusterContainer extends GenericContainer<RedisClusterContainer> implements RedisServer {
 
-	private static final String ENV_MASTERS = "MASTERS";
-	private static final String ENV_SLAVES_PER_MASTER = "SLAVES_PER_MASTER";
-	private static final String ENV_INITIAL_PORT = "INITIAL_PORT";
-	private static final String ENV_IP = "IP";
-
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("grokzen/redis-cluster");
 	public static final String DEFAULT_TAG = "6.2.1";
-	private static final String KEYSPACE_NOTIFICATIONS_IMAGE_NAME = "jruaux/redis-cluster:6.2.1";
 	public static final int DEFAULT_INITIAL_PORT = 7000;
 	public static final int DEFAULT_MASTERS = 3;
 	public static final int DEFAULT_SLAVES_PER_MASTER = 0;
 	public static final String DEFAULT_IP = "0.0.0.0";
+	public static final String ENV_SKIP_TESTS = "skipRedisClusterTests";
+
+	private static final String ENV_MASTERS = "MASTERS";
+	private static final String ENV_SLAVES_PER_MASTER = "SLAVES_PER_MASTER";
+	private static final String ENV_INITIAL_PORT = "INITIAL_PORT";
+	private static final String ENV_IP = "IP";
+	private static final String KEYSPACE_NOTIFICATIONS_IMAGE_NAME = "jruaux/redis-cluster:6.2.1";
 
 	private int initialPort = DEFAULT_INITIAL_PORT;
 	private int masters = DEFAULT_MASTERS;
@@ -131,6 +132,11 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 			return false;
 		RedisClusterContainer other = (RedisClusterContainer) obj;
 		return initialPort == other.initialPort && masters == other.masters && slavesPerMaster == other.slavesPerMaster;
+	}
+
+	@Override
+	public boolean isActive() {
+		return System.getenv(ENV_SKIP_TESTS) == null;
 	}
 
 }

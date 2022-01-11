@@ -6,6 +6,7 @@ public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesCo
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redismod");
 	public static final String DEFAULT_TAG = "latest";
+	public static final String ENV_SKIP_TESTS = "skipRedisModulesTests";
 
 	/**
 	 * @deprecated use {@link RedisModulesContainer(DockerImageName)} instead
@@ -30,6 +31,11 @@ public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesCo
 	@Override
 	public boolean isCluster() {
 		return false;
+	}
+
+	@Override
+	public boolean isActive() {
+		return System.getenv(ENV_SKIP_TESTS) == null;
 	}
 
 }

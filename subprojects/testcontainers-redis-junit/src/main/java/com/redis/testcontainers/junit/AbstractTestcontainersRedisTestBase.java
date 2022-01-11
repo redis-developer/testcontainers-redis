@@ -1,15 +1,18 @@
 package com.redis.testcontainers.junit;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.redis.testcontainers.RedisServer;
@@ -31,29 +34,27 @@ import com.redis.testcontainers.RedisServer;
 @TestInstance(Lifecycle.PER_CLASS)
 public abstract class AbstractTestcontainersRedisTestBase {
 
-	private Map<RedisServer, RedisTestContext> contexts;
+	private static final Logger log = LoggerFactory.getLogger(AbstractTestcontainersRedisTestBase.class);
 
-	protected abstract Collection<RedisServer> servers();
+	private Map<RedisServer, RedisTestContext> contexts = new LinkedHashMap<>();
 
-	protected RedisTestContext getContext(RedisServer server) {
-		return contexts.get(server);
-	}
-
-	protected Collection<RedisServer> testServers() {
-		return servers();
-	}
-
-	protected Collection<RedisTestContext> getAllContexts() {
-		return contexts.values();
-	}
-
-	protected Collection<RedisTestContext> getTestContexts() {
-		return testServers().stream().map(contexts::get).collect(Collectors.toList());
-	}
+	protected abstract Collection<RedisServer> redisServers();
 
 	@BeforeAll
-	protected void setupContexts() {
-		contexts = servers().stream().collect(Collectors.toMap(s -> s, RedisTestContext::new));
+	protected void setup() {
+		Assumptions.assumeTrue(redisServers().stream().anyMatch(RedisServer::isActive));
+		for (RedisServer server : redisServers()) {
+			if (!server.isActive()) {
+				continue;
+			}
+			log.info("Starting container {}", server);
+			server.start();
+			contexts.put(server, new RedisTestContext(server));
+		}
+	}
+
+	protected Collection<RedisTestContext> getRedisTestContexts() {
+		return contexts.values();
 	}
 
 	@BeforeEach
@@ -65,8 +66,9 @@ public abstract class AbstractTestcontainersRedisTestBase {
 	}
 
 	@AfterAll
-	protected void teardownContexts() {
+	protected void teardown() {
 		contexts.values().forEach(RedisTestContext::close);
+		contexts.keySet().forEach(RedisServer::close);
 		contexts.clear();
 	}
 

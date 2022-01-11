@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.testcontainers.junit.jupiter.Container;
 
 import com.redis.testcontainers.RedisClusterContainer;
 import com.redis.testcontainers.RedisContainer;
@@ -17,35 +16,30 @@ import com.redis.testcontainers.RedisServer;
 
 class RedisTests extends AbstractTestcontainersRedisTestBase {
 
-	@Container
-	private static final RedisContainer REDIS = new RedisContainer(
+	private RedisContainer redis = new RedisContainer(
 			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications();
-	@Container
-	private static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer(
+	private RedisModulesContainer redisMod = new RedisModulesContainer(
+			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
+	private RedisModulesContainer redisModPreview = new RedisModulesContainer(
+			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview"));
+	private RedisClusterContainer redisCluster = new RedisClusterContainer(
 			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
 					.withKeyspaceNotifications();
-	@Container
-	private static final RedisModulesContainer REDIS_MOD = new RedisModulesContainer(
-			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
-
-	@Container
-	private static final RedisModulesContainer REDIS_MOD_PREVIEW = new RedisModulesContainer(
-			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview"));
-
-	@Container
-	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
+	private RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG));
 
 	/**
-	 * List of Redis servers that tests will be run against
+	 * 
+	 * @return Redis containers required for the tests
 	 */
 	@Override
-	protected Collection<RedisServer> servers() {
-		return Arrays.asList(REDIS, REDIS_CLUSTER, REDIS_MOD, REDIS_MOD_PREVIEW, REDIS_ENTERPRISE);
+	protected Collection<RedisServer> redisServers() {
+		return Arrays.asList(redis, redisMod, redisModPreview, redisCluster, redisEnterprise);
 	}
 
 	/**
 	 * Assert that the Redis server can be pinged
+	 * 
 	 * @param context test context, including the Redis server to test against
 	 */
 	@ParameterizedTest
@@ -56,6 +50,7 @@ class RedisTests extends AbstractTestcontainersRedisTestBase {
 
 	/**
 	 * Assert that the Redis server can be written to
+	 * 
 	 * @param context test context, including the Redis server to test against
 	 */
 	@ParameterizedTest
