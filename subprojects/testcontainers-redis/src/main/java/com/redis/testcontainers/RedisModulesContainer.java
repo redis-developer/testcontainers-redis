@@ -1,8 +1,12 @@
 package com.redis.testcontainers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.utility.DockerImageName;
 
 public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesContainer> {
+
+	private static final Logger log = LoggerFactory.getLogger(RedisModulesContainer.class);
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redismod");
 	public static final String DEFAULT_TAG = "latest";
@@ -35,7 +39,10 @@ public class RedisModulesContainer extends AbstractRedisContainer<RedisModulesCo
 
 	@Override
 	public boolean isActive() {
-		return System.getenv(ENV_SKIP_TESTS) == null;
+		String skipValue = System.getenv(ENV_SKIP_TESTS);
+		boolean active = !Boolean.parseBoolean(skipValue);
+		log.info("Active: {} ({}='{}'}", active, ENV_SKIP_TESTS, skipValue);
+		return active;
 	}
 
 }

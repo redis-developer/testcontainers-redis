@@ -32,7 +32,7 @@ abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> exten
 
 	@Override
 	public String toString() {
-		return ClassUtils.getShortClassName(getClass()) + " " + getRedisURI();
+		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
 	}
 
 }

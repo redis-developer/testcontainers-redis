@@ -17,6 +17,7 @@ import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.TestEnvironment;
 
@@ -191,7 +192,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 	@Override
 	public String toString() {
-		return "RedisEnterpriseContainer " + getRedisURI();
+		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
 	}
 
 	private boolean isRunning(InspectContainerResponse containerInfo) {
@@ -224,7 +225,10 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 	@Override
 	public boolean isActive() {
-		return System.getenv(ENV_SKIP_TESTS) == null;
+		String skipValue = System.getenv(ENV_SKIP_TESTS);
+		boolean active = !Boolean.parseBoolean(skipValue);
+		log.info("Active: {} ({}='{}'}", active, ENV_SKIP_TESTS, skipValue);
+		return active;
 	}
 
 }

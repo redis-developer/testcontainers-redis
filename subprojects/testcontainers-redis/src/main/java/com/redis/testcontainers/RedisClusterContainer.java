@@ -2,11 +2,16 @@ package com.redis.testcontainers;
 
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 
 public class RedisClusterContainer extends GenericContainer<RedisClusterContainer> implements RedisServer {
+
+	private static final Logger log = LoggerFactory.getLogger(RedisClusterContainer.class);
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("grokzen/redis-cluster");
 	public static final String DEFAULT_TAG = "6.2.1";
@@ -111,7 +116,7 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 
 	@Override
 	public String toString() {
-		return "RedisClusterContainer " + getRedisURI();
+		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
 	}
 
 	@Override
@@ -136,7 +141,10 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 
 	@Override
 	public boolean isActive() {
-		return System.getenv(ENV_SKIP_TESTS) == null;
+		String skipValue = System.getenv(ENV_SKIP_TESTS);
+		boolean active = !Boolean.parseBoolean(skipValue);
+		log.info("Active: {} ({}='{}'}", active, ENV_SKIP_TESTS, skipValue);
+		return active;
 	}
 
 }

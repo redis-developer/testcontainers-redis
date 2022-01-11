@@ -10,7 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import com.redis.enterprise.Database;
 import com.redis.enterprise.RedisModule;
-import com.redis.lettucemod.api.sync.RedisModulesCommands;
 import com.redis.lettucemod.api.sync.RedisTimeSeriesCommands;
 import com.redis.lettucemod.search.Field;
 import com.redis.lettucemod.search.SearchResults;
@@ -34,16 +33,16 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 										.build()));
 	}
 
-	@ParameterizedTest
-	@RedisTestContextsSource
-	void gearsPyExecute(RedisTestContext context) {
-		RedisModulesCommands<String, String> sync = context.sync();
-		sync.set("foo", "bar");
-		String sleepPy = "def sleep(x):\n" + "    from time import sleep\n" + "    sleep(1)\n" + "    return 1\n" + "\n"
-				+ "GB().map(sleep).run()";
-		Assertions.assertTrue(sync.pyexecute(sleepPy).getErrors().isEmpty());
-		Assertions.assertTrue(sync.pyexecute("GB().run()").isOk());
-	}
+//	@ParameterizedTest
+//	@RedisTestContextsSource
+//	void gearsPyExecute(RedisTestContext context) {
+//		RedisModulesCommands<String, String> sync = context.sync();
+//		sync.set("foo", "bar");
+//		String sleepPy = "def sleep(x):\n" + "    from time import sleep\n" + "    sleep(1)\n" + "    return 1\n" + "\n"
+//				+ "GB().map(sleep).run()";
+//		Assertions.assertTrue(sync.pyexecute(sleepPy).getErrors().isEmpty());
+//		Assertions.assertTrue(sync.pyexecute("GB().run()").isOk());
+//	}
 
 	@ParameterizedTest
 	@RedisTestContextsSource
