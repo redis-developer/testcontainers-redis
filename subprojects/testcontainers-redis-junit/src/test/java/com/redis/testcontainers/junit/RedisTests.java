@@ -28,7 +28,6 @@ class RedisTests extends AbstractTestcontainersRedisTestBase {
 						.withKeyspaceNotifications(),
 				new RedisModulesContainer(
 						RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG)),
-				new RedisModulesContainer(RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview")),
 				new RedisClusterContainer(
 						RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
 								.withKeyspaceNotifications(),
