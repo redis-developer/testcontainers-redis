@@ -225,10 +225,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 	@Override
 	public boolean isActive() {
-		String skipValue = System.getenv(ENV_SKIP_TESTS);
-		boolean active = !Boolean.parseBoolean(skipValue);
-		log.info("Active: {} ({}='{}'}", active, ENV_SKIP_TESTS, skipValue);
-		return active;
+		return AbstractRedisContainer.isActive(ENV_SKIP_TESTS);
 	}
 
 }

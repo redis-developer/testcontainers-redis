@@ -35,4 +35,8 @@ abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> exten
 		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
 	}
 
+	public static boolean isActive(String envName) {
+		return !Boolean.parseBoolean(System.getenv(envName));
+	}
+
 }

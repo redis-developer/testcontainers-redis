@@ -22,6 +22,11 @@ public class RedisTestContext implements AutoCloseable {
 		this.server = server;
 	}
 
+	@Override
+	public String toString() {
+		return server.toString();
+	}
+
 	public RedisServer getServer() {
 		return server;
 	}
