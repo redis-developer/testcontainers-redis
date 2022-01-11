@@ -6,8 +6,6 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import io.lettuce.core.cluster.RedisClusterClient;
@@ -19,18 +17,13 @@ import io.lettuce.core.cluster.pubsub.StatefulRedisClusterPubSubConnection;
 @Testcontainers
 class RedisClusterContainerTests {
 
-	private static final Logger log = LoggerFactory.getLogger(RedisClusterContainerTests.class);
-
 	@SuppressWarnings("resource")
 	@Test
 	void emitsKeyspaceNotifications() throws Exception {
-		log.info("Creating RedisCluster container: {}={}", RedisClusterContainer.ENV_SKIP_TESTS,
-				System.getenv(RedisClusterContainer.ENV_SKIP_TESTS));
 		try (RedisClusterContainer redisCluster = new RedisClusterContainer(
 				RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
 						.withKeyspaceNotifications()) {
 			Assumptions.assumeTrue(redisCluster.isActive());
-			log.info("Starting container {}", redisCluster);
 			redisCluster.start();
 			List<String> messages = new ArrayList<>();
 			RedisClusterClient client = RedisClusterClient.create(redisCluster.getRedisURI());

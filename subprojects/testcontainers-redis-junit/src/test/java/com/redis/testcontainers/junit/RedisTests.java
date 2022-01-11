@@ -16,16 +16,16 @@ import com.redis.testcontainers.RedisServer;
 
 class RedisTests extends AbstractTestcontainersRedisTestBase {
 
-	private RedisContainer redis = new RedisContainer(
+	private final RedisContainer redis = new RedisContainer(
 			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications();
-	private RedisModulesContainer redisMod = new RedisModulesContainer(
+	private final RedisModulesContainer redisMod = new RedisModulesContainer(
 			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
-	private RedisModulesContainer redisModPreview = new RedisModulesContainer(
+	private final RedisModulesContainer redisModPreview = new RedisModulesContainer(
 			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag("preview"));
-	private RedisClusterContainer redisCluster = new RedisClusterContainer(
+	private final RedisClusterContainer redisCluster = new RedisClusterContainer(
 			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
 					.withKeyspaceNotifications();
-	private RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
+	private final RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG));
 
 	/**

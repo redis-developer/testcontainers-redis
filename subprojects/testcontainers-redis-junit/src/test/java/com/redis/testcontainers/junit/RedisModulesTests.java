@@ -21,9 +21,9 @@ import com.redis.testcontainers.RedisServer;
 
 class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
-	private RedisModulesContainer redisMod = new RedisModulesContainer(
+	private final RedisModulesContainer redisMod = new RedisModulesContainer(
 			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
-	private RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
+	private final RedisEnterpriseContainer redisEnterprise = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
 					.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
 							.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
