@@ -44,12 +44,11 @@ public abstract class AbstractTestcontainersRedisTestBase {
 	protected void setup() {
 		Assumptions.assumeTrue(redisServers().stream().anyMatch(RedisServer::isActive));
 		for (RedisServer server : redisServers()) {
-			if (!server.isActive()) {
-				continue;
+			if (server.isActive()) {
+				log.info("Starting container {}", server);
+				server.start();
+				contexts.put(server, new RedisTestContext(server));
 			}
-			log.info("Starting container {}", server);
-			server.start();
-			contexts.put(server, new RedisTestContext(server));
 		}
 	}
 
@@ -68,8 +67,10 @@ public abstract class AbstractTestcontainersRedisTestBase {
 	@BeforeEach
 	protected void flushAll() {
 		contexts.forEach((k, v) -> {
-			v.sync().flushall();
-			Awaitility.await().until(() -> v.sync().dbsize() == 0);
+			if (k.isActive()) {
+				v.sync().flushall();
+				Awaitility.await().until(() -> v.sync().dbsize() == 0);
+			}
 		});
 	}
 
