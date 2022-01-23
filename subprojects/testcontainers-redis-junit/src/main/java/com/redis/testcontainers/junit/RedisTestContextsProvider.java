@@ -12,7 +12,7 @@ class RedisTestContextsProvider implements ArgumentsProvider {
 	public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
 		AbstractTestcontainersRedisTestBase instance = (AbstractTestcontainersRedisTestBase) context
 				.getRequiredTestInstance();
-		return instance.getRedisTestContexts().stream().map(Arguments::of);
+		return instance.getTestContexts().stream().map(Arguments::of);
 	}
 
 }

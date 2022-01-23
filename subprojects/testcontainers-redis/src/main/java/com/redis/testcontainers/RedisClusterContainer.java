@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 
 public class RedisClusterContainer extends GenericContainer<RedisClusterContainer> implements RedisServer {
@@ -15,8 +14,8 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 	public static final int DEFAULT_MASTERS = 3;
 	public static final int DEFAULT_SLAVES_PER_MASTER = 0;
 	public static final String DEFAULT_IP = "0.0.0.0";
-	public static final String ENV_SKIP_TESTS = "skipRedisClusterTests";
 
+	private static final String ENV_ENABLED_SUFFIX = "REDIS_CLUSTER";
 	private static final String ENV_MASTERS = "MASTERS";
 	private static final String ENV_SLAVES_PER_MASTER = "SLAVES_PER_MASTER";
 	private static final String ENV_INITIAL_PORT = "INITIAL_PORT";
@@ -112,7 +111,7 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 
 	@Override
 	public String toString() {
-		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
+		return RedisServer.toString(this);
 	}
 
 	@Override
@@ -136,8 +135,8 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 	}
 
 	@Override
-	public boolean isActive() {
-		return AbstractRedisContainer.isActive(ENV_SKIP_TESTS);
+	public boolean isEnabled() {
+		return RedisServer.isEnabled(ENV_ENABLED_SUFFIX);
 	}
 
 }

@@ -21,7 +21,7 @@ class RedisContainerTests {
 	void emitsKeyspaceNotifications() throws InterruptedException {
 		try (RedisContainer redis = new RedisContainer(
 				RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications()) {
-			Assumptions.assumeTrue(redis.isActive());
+			Assumptions.assumeTrue(redis.isEnabled());
 			redis.start();
 			RedisClient client = RedisClient.create(redis.getRedisURI());
 			List<String> messages = new ArrayList<>();

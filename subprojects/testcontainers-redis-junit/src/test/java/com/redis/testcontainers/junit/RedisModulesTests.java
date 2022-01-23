@@ -14,23 +14,32 @@ import com.redis.lettucemod.api.sync.RedisTimeSeriesCommands;
 import com.redis.lettucemod.search.Field;
 import com.redis.lettucemod.search.SearchResults;
 import com.redis.lettucemod.timeseries.CreateOptions;
+import com.redis.testcontainers.RedisContainer;
 import com.redis.testcontainers.RedisEnterpriseContainer;
 import com.redis.testcontainers.RedisModulesContainer;
 import com.redis.testcontainers.RedisServer;
 
 class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
-	@SuppressWarnings("resource")
+	private final RedisContainer REDIS = new RedisContainer(
+			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
+
+	private final RedisModulesContainer REDISMOD = new RedisModulesContainer(
+			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
+
+	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
+			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
+					.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
+							.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
+
 	@Override
 	protected Collection<RedisServer> redisServers() {
-		return Arrays.asList(
-				new RedisModulesContainer(
-						RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG)),
-				new RedisEnterpriseContainer(
-						RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
-								.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
-										.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES)
-										.build()));
+		return Arrays.asList(REDIS, REDISMOD, REDIS_ENTERPRISE);
+	}
+
+	@Override
+	protected Collection<RedisServer> testRedisServers() {
+		return Arrays.asList(REDISMOD, REDIS_ENTERPRISE);
 	}
 
 //	@ParameterizedTest

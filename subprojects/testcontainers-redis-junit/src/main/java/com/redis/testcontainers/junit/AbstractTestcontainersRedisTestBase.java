@@ -1,7 +1,9 @@
 package com.redis.testcontainers.junit;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.awaitility.Awaitility;
@@ -40,14 +42,21 @@ public abstract class AbstractTestcontainersRedisTestBase {
 
 	protected abstract Collection<RedisServer> redisServers();
 
+	protected Collection<RedisServer> testRedisServers() {
+		return contexts.keySet();
+	}
+
 	@BeforeAll
 	protected void setup() {
-		Assumptions.assumeTrue(redisServers().stream().anyMatch(RedisServer::isActive));
-		for (RedisServer server : redisServers()) {
-			if (server.isActive()) {
+		Collection<RedisServer> allRedisServers = redisServers();
+		Assumptions.assumeTrue(allRedisServers.stream().anyMatch(RedisServer::isEnabled));
+		for (RedisServer server : allRedisServers) {
+			if (server.isEnabled()) {
 				log.info("Starting container {}", server);
 				server.start();
 				contexts.put(server, new RedisTestContext(server));
+			} else {
+				log.info("Container {} disabled", server);
 			}
 		}
 	}
@@ -56,18 +65,20 @@ public abstract class AbstractTestcontainersRedisTestBase {
 		return contexts.remove(server);
 	}
 
-	public RedisTestContext getRedisTestContext(RedisServer server) {
-		return contexts.get(server);
-	}
-
-	protected Collection<RedisTestContext> getRedisTestContexts() {
-		return contexts.values();
+	private List<RedisTestContext> contexts(Collection<RedisServer> servers) {
+		List<RedisTestContext> testContexts = new ArrayList<>();
+		for (RedisServer server : servers) {
+			if (contexts.containsKey(server)) {
+				testContexts.add(contexts.get(server));
+			}
+		}
+		return testContexts;
 	}
 
 	@BeforeEach
 	protected void flushAll() {
 		contexts.forEach((k, v) -> {
-			if (k.isActive()) {
+			if (k.isEnabled()) {
 				v.sync().flushall();
 				Awaitility.await().until(() -> v.sync().dbsize() == 0);
 			}
@@ -81,6 +92,18 @@ public abstract class AbstractTestcontainersRedisTestBase {
 			k.close();
 		});
 		contexts.clear();
+	}
+
+	public RedisTestContext getContext(RedisServer server) {
+		return contexts.get(server);
+	}
+
+	public List<RedisTestContext> getAllContexts() {
+		return new ArrayList<>(contexts.values());
+	}
+
+	public List<RedisTestContext> getTestContexts() {
+		return contexts(testRedisServers());
 	}
 
 }

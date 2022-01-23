@@ -7,7 +7,7 @@ public class RedisContainer extends AbstractRedisContainer<RedisContainer> {
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redis");
 	public static final String DEFAULT_TAG = "6.2.6";
-	public static final String ENV_SKIP_TESTS = "skipRedisTests";
+	public static final String ENV_ENABLED_SUFFIX = "REDIS";
 
 	/**
 	 * @deprecated use {@link RedisContainer(DockerImageName)} instead
@@ -43,8 +43,8 @@ public class RedisContainer extends AbstractRedisContainer<RedisContainer> {
 	}
 
 	@Override
-	public boolean isActive() {
-		return AbstractRedisContainer.isActive(ENV_SKIP_TESTS);
+	public boolean isEnabled() {
+		return RedisServer.isEnabled(ENV_ENABLED_SUFFIX);
 	}
 
 }

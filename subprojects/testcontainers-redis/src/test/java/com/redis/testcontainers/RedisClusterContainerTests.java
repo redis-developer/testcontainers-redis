@@ -23,7 +23,7 @@ class RedisClusterContainerTests {
 		try (RedisClusterContainer redisCluster = new RedisClusterContainer(
 				RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
 						.withKeyspaceNotifications()) {
-			Assumptions.assumeTrue(redisCluster.isActive());
+			Assumptions.assumeTrue(redisCluster.isEnabled());
 			redisCluster.start();
 			List<String> messages = new ArrayList<>();
 			RedisClusterClient client = RedisClusterClient.create(redisCluster.getRedisURI());

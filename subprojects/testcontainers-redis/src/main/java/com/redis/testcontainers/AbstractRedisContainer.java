@@ -2,7 +2,6 @@ package com.redis.testcontainers;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 
 abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> extends GenericContainer<C>
@@ -32,11 +31,7 @@ abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> exten
 
 	@Override
 	public String toString() {
-		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
-	}
-
-	public static boolean isActive(String envName) {
-		return !Boolean.parseBoolean(System.getenv(envName));
+		return RedisServer.toString(this);
 	}
 
 }

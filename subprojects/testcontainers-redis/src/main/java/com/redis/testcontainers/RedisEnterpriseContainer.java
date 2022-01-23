@@ -17,7 +17,6 @@ import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.TestEnvironment;
 
@@ -43,8 +42,8 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	public static final int ADMIN_PORT = 8443;
 	public static final int DEFAULT_DATABASE_PORT = 12000;
 	public static final String GEARS_MODULE_FILE = "redisgears.linux-bionic-x64.1.0.6.zip";
-	public static final String ENV_SKIP_TESTS = "skipRedisEnterpriseTests";
 
+	private static final String ENV_ENABLED_SUFFIX = "REDIS_ENTERPRISE";
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
 	private static final int DEFAULT_SHARD_COUNT = 2;
 	private static final String DEFAULT_DATABASE_NAME = "testcontainers";
@@ -192,7 +191,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 	@Override
 	public String toString() {
-		return ClassUtils.getShortClassName(getClass()) + " active=" + isActive();
+		return RedisServer.toString(this);
 	}
 
 	private boolean isRunning(InspectContainerResponse containerInfo) {
@@ -224,8 +223,8 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	}
 
 	@Override
-	public boolean isActive() {
-		return AbstractRedisContainer.isActive(ENV_SKIP_TESTS);
+	public boolean isEnabled() {
+		return RedisServer.isEnabled(ENV_ENABLED_SUFFIX);
 	}
 
 }
