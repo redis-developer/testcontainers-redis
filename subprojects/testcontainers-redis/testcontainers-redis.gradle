@@ -1,6 +1,6 @@
 dependencies {
     implementation group: 'com.redis.testcontainers', name: 'testcontainers', version: testcontainersVersion
-    implementation group: 'com.redis', name: 'redis-enterprise-admin', version: adminVersion
+    api group: 'com.redis', name: 'redis-enterprise-admin', version: adminVersion
     testImplementation 'org.slf4j:slf4j-simple'
     testImplementation group: 'com.redis.testcontainers', name: 'junit-jupiter', version: testcontainersVersion
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
