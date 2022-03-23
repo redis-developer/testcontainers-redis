@@ -26,7 +26,8 @@ public interface RedisServer extends Startable {
 	}
 
 	static boolean isEnabled(String suffix) {
-		String value = System.getenv("TESTCONTAINERS_" + suffix);
+		String name = "TESTCONTAINERS_" + suffix;
+		String value = System.getProperty(name, System.getenv(name));
 		// Containers are enabled by default
 		if (StringUtils.isEmpty(value)) {
 			return true;
