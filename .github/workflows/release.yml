@@ -46,3 +46,8 @@ jobs:
           name: test-reports
           path: |
             build/reports/aggregate-tests/
+
+      - name: Set Version
+        uses: redis-field-engineering/redis-version-action@v2
+        with:
+          version: ${{ github.event.inputs.version }}
