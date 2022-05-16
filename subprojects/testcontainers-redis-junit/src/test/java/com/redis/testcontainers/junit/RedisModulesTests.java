@@ -14,6 +14,7 @@ import com.redis.lettucemod.api.sync.RedisTimeSeriesCommands;
 import com.redis.lettucemod.search.Field;
 import com.redis.lettucemod.search.SearchResults;
 import com.redis.lettucemod.timeseries.CreateOptions;
+import com.redis.lettucemod.timeseries.Label;
 import com.redis.testcontainers.RedisContainer;
 import com.redis.testcontainers.RedisEnterpriseContainer;
 import com.redis.testcontainers.RedisModulesContainer;
@@ -29,8 +30,8 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
 	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
-					.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
-							.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
+			.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
+					.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
 
 	@Override
 	protected Collection<RedisServer> redisServers() {
@@ -53,12 +54,13 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 //		Assertions.assertTrue(sync.pyexecute("GB().run()").isOk());
 //	}
 
+	@SuppressWarnings("unchecked")
 	@ParameterizedTest
 	@RedisTestContextsSource
 	void timeSeries(RedisTestContext context) {
 		RedisTimeSeriesCommands<String, String> ts = context.sync();
-		ts.create("temperature:3:11", CreateOptions.<String, String>builder().retentionTime(6000)
-				.label("sensor_id", "2").label("area_id", "32").build());
+		ts.create("temperature:3:11", CreateOptions.<String, String>builder().retentionPeriod(6000)
+				.labels(Label.of("sensor_id", "2"), Label.of("area_id", "32")).build());
 		// TS.ADD temperature:3:11 1548149181 30
 		Long add1 = ts.add("temperature:3:11", 1548149181, 30);
 		Assertions.assertEquals(1548149181, add1);
