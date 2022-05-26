@@ -5,9 +5,10 @@
 :project-group:   com.redis.testcontainers
 :project-version: 1.5.5
 
-image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
-image:https://img.shields.io/maven-central/v/{project-group}/{project-name}.svg[Download, link="https://search.maven.org/#search|ga|1|{project-name}"]
-image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/total[GitHub all releases]
+image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status",link="https://github.com/{project-owner}/{project-name}/actions"]
+image:https://img.shields.io/maven-central/v/{project-group}/{project-name}[Download,link="https://search.maven.org/#search|ga|1|{project-name}"]
+image:https://img.shields.io/nexus/s/{project-group}/{project-name}?server=https%3A%2F%2Fs01.oss.sonatype.org[Snapshot,link="https://s01.oss.sonatype.org/#nexus-search;quick~{project-name}"]
+image:https://img.shields.io/github/license/{project-owner}/{project-name}["License",link="https://github.com/{project-owner}/{project-name}"]
 
 Testcontainers Redis is an extension of Testcontainers that supports Redis (Standalone and Cluster), Redis Modules, and Redis Enterprise containers.
 
