@@ -13,6 +13,7 @@ import com.redis.testcontainers.RedisContainer;
 import com.redis.testcontainers.RedisEnterpriseContainer;
 import com.redis.testcontainers.RedisModulesContainer;
 import com.redis.testcontainers.RedisServer;
+import com.redis.testcontainers.RedisStackContainer;
 
 class RedisTests extends AbstractTestcontainersRedisTestBase {
 
@@ -20,9 +21,11 @@ class RedisTests extends AbstractTestcontainersRedisTestBase {
 			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG)).withKeyspaceNotifications();
 	private static final RedisModulesContainer REDISMOD = new RedisModulesContainer(
 			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
+	private static final RedisStackContainer REDIS_STACK = new RedisStackContainer(
+			RedisStackContainer.DEFAULT_IMAGE_NAME.withTag(RedisStackContainer.DEFAULT_TAG));
 	private static final RedisClusterContainer REDIS_CLUSTER = new RedisClusterContainer(
 			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
-					.withKeyspaceNotifications();
+			.withKeyspaceNotifications();
 	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG));
 
@@ -32,7 +35,7 @@ class RedisTests extends AbstractTestcontainersRedisTestBase {
 	 */
 	@Override
 	protected Collection<RedisServer> redisServers() {
-		return Arrays.asList(REDIS, REDISMOD, REDIS_CLUSTER, REDIS_ENTERPRISE);
+		return Arrays.asList(REDIS, REDISMOD, REDIS_STACK, REDIS_CLUSTER, REDIS_ENTERPRISE);
 	}
 
 	/**

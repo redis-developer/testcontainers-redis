@@ -19,14 +19,18 @@ import com.redis.testcontainers.RedisContainer;
 import com.redis.testcontainers.RedisEnterpriseContainer;
 import com.redis.testcontainers.RedisModulesContainer;
 import com.redis.testcontainers.RedisServer;
+import com.redis.testcontainers.RedisStackContainer;
 
 class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
-	private final RedisContainer REDIS = new RedisContainer(
+	private static final RedisContainer REDIS = new RedisContainer(
 			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
 
-	private final RedisModulesContainer REDISMOD = new RedisModulesContainer(
+	private static final RedisModulesContainer REDISMOD = new RedisModulesContainer(
 			RedisModulesContainer.DEFAULT_IMAGE_NAME.withTag(RedisModulesContainer.DEFAULT_TAG));
+
+	private static final RedisStackContainer REDIS_STACK = new RedisStackContainer(
+			RedisStackContainer.DEFAULT_IMAGE_NAME.withTag(RedisStackContainer.DEFAULT_TAG));
 
 	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
 			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
@@ -35,7 +39,7 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 
 	@Override
 	protected Collection<RedisServer> redisServers() {
-		return Arrays.asList(REDIS, REDISMOD, REDIS_ENTERPRISE);
+		return Arrays.asList(REDIS, REDISMOD, REDIS_STACK, REDIS_ENTERPRISE);
 	}
 
 	@Override
