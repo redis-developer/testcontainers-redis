@@ -76,7 +76,6 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 		addFixedExposedPort(ADMIN_PORT, ADMIN_PORT);
 		addFixedExposedPort(database.getPort(), database.getPort());
 		withPrivilegedMode(true);
-		withPublishAllPorts(false);
 		waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n",
 				1));
 	}

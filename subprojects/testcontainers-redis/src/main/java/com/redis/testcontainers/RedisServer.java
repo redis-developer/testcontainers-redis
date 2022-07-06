@@ -2,8 +2,8 @@ package com.redis.testcontainers;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.lifecycle.Startable;
-import org.testcontainers.shaded.org.apache.commons.lang.ClassUtils;
-import org.testcontainers.shaded.org.apache.commons.lang.StringUtils;
+import org.testcontainers.shaded.org.apache.commons.lang3.ClassUtils;
+import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 
 public interface RedisServer extends Startable {
 

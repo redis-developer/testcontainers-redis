@@ -1,6 +1,6 @@
 dependencies {
     api project(':testcontainers-redis')
-    api group: 'com.redis.testcontainers', name: 'junit-jupiter', version: testcontainersVersion
+    api group: 'org.testcontainers', name: 'junit-jupiter', version: testcontainersVersion
     api 'org.junit.jupiter:junit-jupiter-api'
     api 'org.junit.jupiter:junit-jupiter-params'
     runtimeOnly 'org.junit.jupiter:junit-jupiter-engine'

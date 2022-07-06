@@ -3,7 +3,7 @@ package com.redis.testcontainers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -22,7 +22,7 @@ class RedisClusterContainerTests {
 	void emitsKeyspaceNotifications() throws Exception {
 		try (RedisClusterContainer redisCluster = new RedisClusterContainer(
 				RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
-						.withKeyspaceNotifications()) {
+				.withKeyspaceNotifications()) {
 			Assumptions.assumeTrue(redisCluster.isEnabled());
 			redisCluster.start();
 			List<String> messages = new ArrayList<>();
@@ -32,11 +32,9 @@ class RedisClusterContainerTests {
 				pubSubConnection.addListener(new ClusterPubSubListener(messages));
 				pubSubConnection.setNodeMessagePropagation(true);
 				pubSubConnection.sync().upstream().commands().psubscribe("__keyspace@0__:*");
-				Thread.sleep(10);
 				connection.sync().set("key1", "value");
 				connection.sync().set("key2", "value");
-				Thread.sleep(10);
-				Assertions.assertEquals(2, messages.size());
+				Awaitility.await().until(() -> messages.size() == 2);
 			} finally {
 				client.shutdown();
 				client.getResources().shutdown();
