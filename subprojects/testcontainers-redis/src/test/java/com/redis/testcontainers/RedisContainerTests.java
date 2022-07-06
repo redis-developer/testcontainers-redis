@@ -3,10 +3,10 @@ package com.redis.testcontainers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -37,7 +37,7 @@ class RedisContainerTests {
 				client.shutdown();
 				client.getResources().shutdown();
 			}
-			Assertions.assertEquals(2, messages.size());
+			Awaitility.await().until(() -> messages.size() == 2);
 		}
 	}
 

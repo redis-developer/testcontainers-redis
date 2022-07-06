@@ -3,10 +3,10 @@ package com.redis.testcontainers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
