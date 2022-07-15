@@ -79,8 +79,10 @@ public abstract class AbstractTestcontainersRedisTestBase {
 	protected void flushAll() {
 		contexts.forEach((k, v) -> {
 			if (k.isEnabled()) {
-				v.sync().flushall();
-				Awaitility.await().until(() -> v.sync().dbsize() == 0);
+				Awaitility.await().until(() -> {
+					v.sync().flushall();
+					return v.sync().dbsize() == 0;
+				});
 			}
 		});
 	}
