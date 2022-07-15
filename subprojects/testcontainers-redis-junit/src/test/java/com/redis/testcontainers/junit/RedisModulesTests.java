@@ -10,11 +10,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import com.redis.enterprise.Database;
 import com.redis.enterprise.RedisModule;
-import com.redis.lettucemod.api.sync.RedisTimeSeriesCommands;
 import com.redis.lettucemod.search.Field;
 import com.redis.lettucemod.search.SearchResults;
 import com.redis.lettucemod.timeseries.CreateOptions;
 import com.redis.lettucemod.timeseries.Label;
+import com.redis.lettucemod.timeseries.Sample;
 import com.redis.testcontainers.RedisContainer;
 import com.redis.testcontainers.RedisEnterpriseContainer;
 import com.redis.testcontainers.RedisModulesContainer;
@@ -62,25 +62,25 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 	@ParameterizedTest
 	@RedisTestContextsSource
 	void timeSeries(RedisTestContext context) {
-		RedisTimeSeriesCommands<String, String> ts = context.sync();
-		ts.create("temperature:3:11", CreateOptions.<String, String>builder().retentionPeriod(6000)
+		context.sync().tsCreate("temperature:3:11", CreateOptions.<String, String>builder().retentionPeriod(6000)
 				.labels(Label.of("sensor_id", "2"), Label.of("area_id", "32")).build());
 		// TS.ADD temperature:3:11 1548149181 30
-		Long add1 = ts.add("temperature:3:11", 1548149181, 30);
+		Long add1 = context.sync().tsAdd("temperature:3:11", Sample.of(1548149181, 30));
 		Assertions.assertEquals(1548149181, add1);
 	}
 
+	@SuppressWarnings("unchecked")
 	@ParameterizedTest
 	@RedisTestContextsSource
 	void search(RedisTestContext context) {
-		context.sync().create("test", Field.text("name").build(), Field.tag("id").build());
+		context.sync().ftCreate("test", Field.text("name").build(), Field.tag("id").build());
 		for (int index = 0; index < 10; index++) {
 			Map<String, String> hash = new HashMap<>();
 			hash.put("name", "name " + index);
 			hash.put("id", String.valueOf(index + 1));
 			context.sync().hset("hash:" + index, hash);
 		}
-		SearchResults<String, String> results = context.sync().search("test", "*");
+		SearchResults<String, String> results = context.sync().ftSearch("test", "*");
 		Assertions.assertEquals(10, results.getCount());
 	}
 
