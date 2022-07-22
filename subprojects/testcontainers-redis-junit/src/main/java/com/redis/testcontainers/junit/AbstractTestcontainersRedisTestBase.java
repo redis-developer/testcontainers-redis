@@ -34,7 +34,7 @@ import com.redis.testcontainers.RedisServer;
  */
 @Testcontainers
 @TestInstance(Lifecycle.PER_CLASS)
-public abstract class AbstractTestcontainersRedisTestBase {
+public abstract class AbstractTestcontainersRedisTestBase implements RedisTestInstance {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractTestcontainersRedisTestBase.class);
 
@@ -104,7 +104,8 @@ public abstract class AbstractTestcontainersRedisTestBase {
 		return new ArrayList<>(contexts.values());
 	}
 
-	public List<RedisTestContext> getTestContexts() {
+	@Override
+	public List<RedisTestContext> getContexts() {
 		return contexts(testRedisServers());
 	}
 

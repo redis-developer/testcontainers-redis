@@ -27,7 +27,7 @@ class RedisTests extends AbstractTestcontainersRedisTestBase {
 			RedisClusterContainer.DEFAULT_IMAGE_NAME.withTag(RedisClusterContainer.DEFAULT_TAG))
 			.withKeyspaceNotifications();
 	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
-			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG));
+			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag("latest"));
 
 	/**
 	 * 

@@ -33,7 +33,7 @@ class RedisModulesTests extends AbstractTestcontainersRedisTestBase {
 			RedisStackContainer.DEFAULT_IMAGE_NAME.withTag(RedisStackContainer.DEFAULT_TAG));
 
 	private static final RedisEnterpriseContainer REDIS_ENTERPRISE = new RedisEnterpriseContainer(
-			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag(RedisEnterpriseContainer.DEFAULT_TAG))
+			RedisEnterpriseContainer.DEFAULT_IMAGE_NAME.withTag("latest"))
 			.withDatabase(Database.name("RedisEnterpriseContainerTests").ossCluster(true)
 					.modules(RedisModule.SEARCH, RedisModule.GEARS, RedisModule.TIMESERIES).build());
 
