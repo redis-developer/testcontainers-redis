@@ -2,7 +2,8 @@ project:
   name: testcontainers-redis
   description: Testcontainers Redis
   longDescription: Testcontainers extension for Redis, Redis Modules, and Redis Enterprise
-  website: https://github.com/redis-developer/testcontainers-redis
+  links:
+    homepage: https://github.com/redis-developer/testcontainers-redis
   authors:
     - Julien Ruaux
   license: Apache-2.0
@@ -10,8 +11,7 @@ project:
     groupId: com.redis.testcontainers
     version: 8
     multiProject: true
-  extraProperties:
-    inceptionYear: 2020
+  inceptionYear: 2020
   tags:
     - 'redis'
     - 'testcontainers'
