@@ -4,7 +4,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public class RedisStackContainer extends AbstractRedisContainer<RedisStackContainer> {
 
-	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redis/redis-stack");
+	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redis/redis-stack-server");
 	public static final String DEFAULT_TAG = "latest";
 	public static final String ENV_ENABLED_SUFFIX = "REDIS_STACK";
 
