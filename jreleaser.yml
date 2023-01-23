@@ -10,7 +10,7 @@ project:
   inceptionYear: 2020
   java:
     groupId: com.redis.testcontainers
-    version: 11
+    version: 17
     multiProject: true
   tags:
     - 'redis'
