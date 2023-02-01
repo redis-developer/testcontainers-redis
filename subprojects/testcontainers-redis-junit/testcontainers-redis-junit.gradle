@@ -7,5 +7,5 @@ dependencies {
     api group: 'com.redis', name: 'lettucemod', version: lettucemodVersion
     api group: 'org.awaitility', name: 'awaitility', version: awaitilityVersion
     testImplementation 'org.slf4j:slf4j-simple'
-    testImplementation group: 'com.redis', name: 'redis-enterprise-admin', version: adminVersion
+    testImplementation group: 'com.redis', name: 'redis-enterprise-admin', version: rsAdminVersion
 }

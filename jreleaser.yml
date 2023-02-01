@@ -7,11 +7,11 @@ project:
   authors:
     - Julien Ruaux
   license: Apache-2.0
-  inceptionYear: 2020
   java:
     groupId: com.redis.testcontainers
     version: 17
     multiProject: true
+  inceptionYear: 2020
   tags:
     - 'redis'
     - 'testcontainers'
@@ -57,7 +57,7 @@ signing:
 deploy:
   maven:
     pomchecker:
-      version: 1.6.0
+      version: early-access
     nexus2:
       maven-central:
         active: RELEASE

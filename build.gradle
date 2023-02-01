@@ -2,32 +2,32 @@ config {
     info {
         description = 'Testcontainers Redis'
         inceptionYear = '2020'
-        tags = ['spring', 'batch', 'redis']
-
+        tags = ['testcontainers', 'redis']
+        
         links {
             website      = "https://github.com/redis-developer/${project.rootProject.name}"
             issueTracker = "https://github.com/redis-developer/${project.rootProject.name}/issues"
             scm          = "https://github.com/redis-developer/${project.rootProject.name}.git"
         }
-
+        
         scm {
             url                 = "https://github.com/redis-developer/${project.rootProject.name}"
             connection          = "scm:git:https://github.com/redis-developer/${project.rootProject.name}.git"
             developerConnection = "scm:git:git@github.com:redis-developer/${project.rootProject.name}.git"
         }
-
+        
         specification {
             enabled = true
         }
-
+        
         implementation {
             enabled = true
         }
         
         people {
             person {
-                id = 'jruaux'
-                name = 'Julien Ruaux'
+                id    = 'jruaux'
+                name  = 'Julien Ruaux'
                 roles = ['developer', 'author']
             }
         }
@@ -35,17 +35,15 @@ config {
     
     docs {
         javadoc {
-            options {
-                autoLinks {
-                    enabled = false
-                }
-            }
-            aggregate {
+            autoLinks {
                 enabled = false
             }
         }
+        sourceHtml {
+            enabled = false
+        }
     }
-
+    
     licensing {
         enabled = false
         licenses {
@@ -55,12 +53,12 @@ config {
         }
     }
     
-	coverage {
+    coverage {
         jacoco {
             enabled = true
             toolVersion = jacocoVersion
         }
-    }    
+    }
 }
 
 allprojects {
@@ -68,7 +66,7 @@ allprojects {
         mavenLocal()
         gradlePluginPortal()
     }
-
+    
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
     }
@@ -84,7 +82,7 @@ subprojects {
             description = project.project_description
         }
     }
-
+    
     license {
         exclude('build/**')
     }
@@ -96,7 +94,7 @@ subprojects {
     bootJar {
         enabled = false
     }
-
+    
     jar {
         enabled = true
         archiveClassifier = ''
