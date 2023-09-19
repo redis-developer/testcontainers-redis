@@ -39,9 +39,6 @@ config {
                 enabled = false
             }
         }
-        sourceHtml {
-            enabled = false
-        }
     }
     
     licensing {
@@ -107,10 +104,6 @@ subprojects {
     
     compileJava {
         options.release = 8
-    }
-    
-    configurations {
-        all*.exclude module: 'spring-boot-starter-logging'
     }
     
     configurations.all {

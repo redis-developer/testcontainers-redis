@@ -17,7 +17,7 @@ apply plugin: 'org.kordamp.gradle.kordamp-parentbuild'
 rootProject.name = 'testcontainers-redis'
 
 projects {
-    directories = ['subprojects']
+    directories = ['core']
 
     plugins {
         all {
@@ -26,10 +26,26 @@ projects {
         path(':') {
             id 'org.kordamp.gradle.java-project'
         }
-        dirs(['subprojects']) {
+        dirs(['core']) {
             id 'java-library'
             id 'org.springframework.boot'
             id 'io.spring.dependency-management'
         }
+    }
+}
+
+enforce {
+    rule(enforcer.rules.EnforceBytecodeVersion) { r ->
+        // search only on compile and runtime classpaths
+        r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
+        r.maxJdkVersion = '1.8'
+    }
+    rule(enforcer.rules.BanDuplicateClasses) { r ->
+        // search only on compile and runtime classpaths
+        r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
+    }
+    rule(enforcer.rules.ForceDependencies) { r ->
+        r.dependencies.addAll "org.testcontainers:testcontainers:$testcontainersVersion",
+            "com.redis:lettucemod:$lettucemodVersion"
     }
 }
