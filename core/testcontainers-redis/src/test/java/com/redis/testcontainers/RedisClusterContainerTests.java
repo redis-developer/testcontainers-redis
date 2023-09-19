@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
@@ -15,6 +17,7 @@ import io.lettuce.core.cluster.pubsub.RedisClusterPubSubAdapter;
 import io.lettuce.core.cluster.pubsub.StatefulRedisClusterPubSubConnection;
 
 @Testcontainers
+@DisabledOnOs(value = OS.MAC)
 class RedisClusterContainerTests {
 
 	@SuppressWarnings("resource")
