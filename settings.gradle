@@ -45,7 +45,6 @@ enforce {
         r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
     }
     rule(enforcer.rules.ForceDependencies) { r ->
-        r.dependencies.addAll "org.testcontainers:testcontainers:$testcontainersVersion",
-            "com.redis:lettucemod:$lettucemodVersion"
+        r.dependencies.addAll "com.redis:lettucemod:$lettucemodVersion"
     }
 }
