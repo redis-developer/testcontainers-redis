@@ -1,7 +1,8 @@
 package com.redis.testcontainers;
 
-import java.util.Objects;
 
+import com.redis.testcontainers.RedisServer;
+import java.util.Objects;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
@@ -27,7 +28,7 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 	private int slavesPerMaster = DEFAULT_SLAVES_PER_MASTER;
 
 	/**
-	 * @deprecated use {@link RedisClusterContainer(DockerImageName)} instead
+	 * @deprecated use {@link RedisClusterContainer (DockerImageName)} instead
 	 */
 	@Deprecated
 	public RedisClusterContainer() {
@@ -37,8 +38,14 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 	public RedisClusterContainer(DockerImageName dockerImageName) {
 		super(dockerImageName);
 		withIP(DEFAULT_IP);
-		update();
 		waitingFor(Wait.forLogMessage(".*Cluster state changed: ok*\\n", 1));
+	}
+
+	// This is called in the GenericContainer before the container is started to configure itself.
+	// At this point we call update to setup the environment variables and ports.
+	@Override
+	protected void configure() {
+		update();
 	}
 
 	@Override
@@ -93,7 +100,7 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 			throw new IllegalArgumentException("Count must be greater than zero");
 		}
 		this.masters = count;
-		return update();
+		return this;
 	}
 
 	public RedisClusterContainer withSlavesPerMaster(int count) {
@@ -101,12 +108,12 @@ public class RedisClusterContainer extends GenericContainer<RedisClusterContaine
 			throw new IllegalArgumentException("Count must be zero or greater");
 		}
 		this.slavesPerMaster = count;
-		return update();
+		return this;
 	}
 
 	public RedisClusterContainer withInitialPort(int port) {
 		this.initialPort = port;
-		return update();
+		return this;
 	}
 
 	@Override
