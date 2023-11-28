@@ -35,8 +35,48 @@ dependencies {
 
 == Usage
 
-Redis::
-https://github.com/redis-developer/testcontainers-redis/tree/master/subprojects/testcontainers-redis-junit/src/test/java/com/redis/testcontainers/junit/RedisTests.java[RedisTests.java]
+.Redis Example
+[source,java]
+----
+@Testcontainers
+public class RedisExampleTest {
 
-Redis Modules::
-https://github.com/redis-developer/testcontainers-redis/tree/master/subprojects/testcontainers-redis-junit/src/test/java/com/redis/testcontainers/junit/RedisModulesTests.java[RedisModulesTests.java]
+	@Container
+	private static RedisContainer redisContainer = new RedisContainer(
+			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
+
+	@Test
+	void testSomethingUsingLettuce() {
+		// Retrieve the Redis URI from the container
+		String redisURI = redisContainer.getRedisURI();
+		RedisClient client = RedisClient.create(redisURI);
+		try (StatefulRedisConnection<String, String> connection = client.connect()) {
+			RedisCommands<String, String> commands = connection.sync();
+			Assertions.assertEquals("PONG", commands.ping());
+		}
+	}
+}
+----
+
+.Redis Stack Example
+[source,java]
+----
+@Testcontainers
+class RedisStackExampleTest {
+
+    @Container
+    private static RedisStackContainer redisContainer = new RedisStackContainer(
+			RedisStackContainer.DEFAULT_IMAGE_NAME.withTag(RedisStackContainer.DEFAULT_TAG));
+
+    @Test
+    void testSomethingUsingLettuceMod() {
+        // Retrieve the Redis URI from the container
+        String redisURI = redisContainer.getRedisURI();
+        RedisModulesClient client = RedisModulesClient.create(redisURI);
+        try (StatefulRedisModulesConnection<String, String> connection = client.connect()) {
+            RedisModulesCommands<String, String> commands = connection.sync();
+            Assertions.assertEquals("PONG", commands.ping());
+        }
+    }
+}
+----
