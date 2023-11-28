@@ -102,10 +102,6 @@ subprojects {
         archiveClassifier = ''
     }
     
-    compileJava {
-        options.release = 8
-    }
-    
     configurations.all {
 		resolutionStrategy.eachDependency { DependencyResolveDetails details ->
 			if (details.requested.name == 'lettuce-core' ) {

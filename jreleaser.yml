@@ -8,10 +8,10 @@ project:
     - Julien Ruaux
   license: Apache-2.0
   java:
-    groupId: com.redis.testcontainers
-    version: 17
+    groupId: com.redis
+    version: '17'
     multiProject: true
-  inceptionYear: 2020
+  inceptionYear: '2020'
   tags:
     - 'redis'
     - 'testcontainers'
@@ -70,5 +70,5 @@ files:
   artifacts:
     - path: VERSION
       extraProperties:
-        skipChecksum: true
-        skipSigning: true
+        skipChecksum: 'true'
+        skipSigning: 'true'

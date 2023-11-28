@@ -9,6 +9,7 @@ buildscript {
         classpath "org.kordamp.gradle:jacoco-gradle-plugin:$kordampPluginVersion"
         classpath "org.kordamp.gradle:kordamp-parentbuild:$kordampBuildVersion"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$bootPluginVersion"
+        classpath "io.spring.gradle:dependency-management-plugin:$dependencyPluginVersion"
     }
 }
 
@@ -35,11 +36,6 @@ projects {
 }
 
 enforce {
-    rule(enforcer.rules.EnforceBytecodeVersion) { r ->
-        // search only on compile and runtime classpaths
-        r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
-        r.maxJdkVersion = '1.8'
-    }
     rule(enforcer.rules.BanDuplicateClasses) { r ->
         // search only on compile and runtime classpaths
         r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
