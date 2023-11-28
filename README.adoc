@@ -2,12 +2,12 @@
 :linkattrs:
 :project-owner:   redis-developer
 :project-name:    testcontainers-redis
-:project-group:   com.redis.testcontainers
+:project-group:   com.redis
 :project-version: 1.7.0
 
 image:https://github.com/{project-owner}/{project-name}/actions/workflows/early-access.yml/badge.svg["Build Status",link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-group}/{project-name}[Download,link="https://search.maven.org/#search|ga|1|{project-name}"]
-image:https://img.shields.io/nexus/s/{project-group}/{project-name}?server=https%3A%2F%2Fs01.oss.sonatype.org[Snapshot,link="https://s01.oss.sonatype.org/#nexus-search;quick~{project-name}"]
+image:https://img.shields.io/nexus/s/{project-group}/{project-name}?server=https%3A%2F%2Fs01.oss.sonatype.org[Snapshot,link="https://s01.oss.sonatype.org/#nexus-search;gav~{project-group}~{project-name}"]
 image:https://img.shields.io/github/license/{project-owner}/{project-name}["License",link="https://github.com/{project-owner}/{project-name}"]
 
 Testcontainers Redis is an extension of Testcontainers that supports Redis (Standalone and Cluster), Redis Modules, and Redis Enterprise containers.
@@ -18,7 +18,7 @@ Testcontainers Redis is an extension of Testcontainers that supports Redis (Stan
 [source,groovy,subs="+attributes"]
 ----
 dependencies {
-    testImplementation "{project-group}:testcontainers-redis-junit:{project-version}"
+    testImplementation "{project-group}:{project-name}:{project-version}"
 }
 ----
 
@@ -27,7 +27,7 @@ dependencies {
 ----
 <dependency>
     <groupId>{project-group}</groupId>
-    <artifactId>testcontainers-redis-junit</artifactId>
+    <artifactId>{project-name}</artifactId>
     <version>{project-version}</version>
     <scope>test</scope>
 </dependency>
