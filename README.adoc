@@ -41,20 +41,20 @@ dependencies {
 @Testcontainers
 public class RedisExampleTest {
 
-    @Container
-    private static RedisContainer redisContainer = new RedisContainer(
-        RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
+	@Container
+	private static RedisContainer container = new RedisContainer(
+			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
 
-    @Test
-    void testSomethingUsingLettuce() {
-        // Retrieve the Redis URI from the container
-        String redisURI = redisContainer.getRedisURI();
-        RedisClient client = RedisClient.create(redisURI);
-        try (StatefulRedisConnection<String, String> connection = client.connect()) {
-            RedisCommands<String, String> commands = connection.sync();
-            Assertions.assertEquals("PONG", commands.ping());
-        }
-    }
+	@Test
+	void testSomethingUsingLettuce() {
+		// Retrieve the Redis URI from the container
+		String redisURI = container.getRedisURI();
+		RedisClient client = RedisClient.create(redisURI);
+		try (StatefulRedisConnection<String, String> connection = client.connect()) {
+			RedisCommands<String, String> commands = connection.sync();
+			Assertions.assertEquals("PONG", commands.ping());
+		}
+	}
 }
 ----
 
@@ -64,19 +64,22 @@ public class RedisExampleTest {
 @Testcontainers
 class RedisStackExampleTest {
 
-    @Container
-    private static RedisStackContainer redisContainer = new RedisStackContainer(
-            RedisStackContainer.DEFAULT_IMAGE_NAME.withTag(RedisStackContainer.DEFAULT_TAG));
+	@Container
+	private static RedisStackContainer container = new RedisStackContainer(
+			RedisStackContainer.DEFAULT_IMAGE_NAME.withTag(RedisStackContainer.DEFAULT_TAG));
 
-    @Test
-    void testSomethingUsingLettuceMod() {
-        // Retrieve the Redis URI from the container
-        String redisURI = redisContainer.getRedisURI();
-        RedisModulesClient client = RedisModulesClient.create(redisURI);
-        try (StatefulRedisModulesConnection<String, String> connection = client.connect()) {
-            RedisModulesCommands<String, String> commands = connection.sync();
-            Assertions.assertEquals("PONG", commands.ping());
-        }
-    }
+	@Test
+	void testSomethingUsingLettuceMod() {
+		// Retrieve the Redis URI from the container
+		String redisURI = container.getRedisURI();
+		RedisModulesClient client = RedisModulesClient.create(redisURI);
+		try (StatefulRedisModulesConnection<String, String> connection = client.connect()) {
+			RedisModulesCommands<String, String> commands = connection.sync();
+			commands.ftCreate("myIndex", Field.tag("myField").build());
+			IndexInfo indexInfo = RedisModulesUtils.indexInfo(commands.ftInfo("myIndex"));
+			Assertions.assertEquals(1, indexInfo.getFields().size());
+			Assertions.assertEquals("myField", indexInfo.getFields().get(0).getName());
+		}
+	}
 }
 ----
