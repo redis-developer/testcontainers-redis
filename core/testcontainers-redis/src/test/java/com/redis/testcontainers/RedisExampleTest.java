@@ -10,16 +10,16 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 
 @Testcontainers
-public class RedisExampleTest {
+class RedisExampleTest {
 
 	@Container
-	private static RedisContainer redisContainer = new RedisContainer(
+	private static RedisContainer container = new RedisContainer(
 			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
 
 	@Test
 	void testSomethingUsingLettuce() {
 		// Retrieve the Redis URI from the container
-		String redisURI = redisContainer.getRedisURI();
+		String redisURI = container.getRedisURI();
 		RedisClient client = RedisClient.create(redisURI);
 		try (StatefulRedisConnection<String, String> connection = client.connect()) {
 			RedisCommands<String, String> commands = connection.sync();

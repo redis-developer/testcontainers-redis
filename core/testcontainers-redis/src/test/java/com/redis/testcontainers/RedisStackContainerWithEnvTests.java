@@ -10,8 +10,7 @@ class RedisStackContainerWithEnvTests extends AbstractModulesTestBase {
 			.withEnv("REDISEARCH_ARGS", "MAXAGGREGATERESULTS 100000");
 
 	@Override
-	protected RedisServer getRedisServer() {
+	protected RedisStackContainer getRedisContainer() {
 		return container;
 	}
-
 }

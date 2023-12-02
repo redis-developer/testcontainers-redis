@@ -1,22 +1,22 @@
 package com.redis.testcontainers;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.ContainerLaunchException;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang3.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.TestEnvironment;
 
@@ -28,25 +28,30 @@ import com.github.dockerjava.api.exception.DockerException;
 import com.redis.enterprise.Admin;
 import com.redis.enterprise.Database;
 import com.redis.enterprise.Database.ModuleConfig;
-import com.redis.enterprise.RedisModule;
 import com.redis.enterprise.rest.InstalledModule;
 
-public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseContainer> implements RedisServer {
+public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterpriseContainer> {
 
 	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
 
 	public static final String ADMIN_USERNAME = "testcontainers@redis.com";
-	public static final String ADMIN_PASSWORD = "redis123";
-	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
-	public static final String DEFAULT_TAG = "6.2.8-50";
-	public static final int ADMIN_PORT = 8443;
-	public static final int DEFAULT_DATABASE_PORT = 12000;
-	public static final String GEARS_MODULE_FILE = "redisgears.linux-bionic-x64.1.0.6.zip";
 
-	private static final String ENV_ENABLED_SUFFIX = "REDIS_ENTERPRISE";
+	public static final String ADMIN_PASSWORD = "redis123";
+
+	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
+
+	public static final String DEFAULT_TAG = "latest";
+
+	public static final int ADMIN_PORT = 8443;
+
+	public static final int DEFAULT_DATABASE_PORT = 12000;
+
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
+
 	private static final int DEFAULT_SHARD_COUNT = 2;
+
 	private static final String DEFAULT_DATABASE_NAME = "testcontainers";
+
 	private static final String RLADMIN = "/opt/redislabs/bin/rladmin";
 
 	private static final Long EXIT_CODE_SUCCESS = 0L;
@@ -54,20 +59,8 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	private Database database = Database.name(DEFAULT_DATABASE_NAME).shardCount(DEFAULT_SHARD_COUNT)
 			.port(DEFAULT_DATABASE_PORT).build();
 
-	/**
-	 * @deprecated use {@link RedisEnterpriseContainer(DockerImageName)} instead
-	 */
-	@Deprecated
-	public RedisEnterpriseContainer() {
-		this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
-	}
-
-	/**
-	 * @deprecated use {@link RedisEnterpriseContainer(DockerImageName)} instead
-	 */
-	@Deprecated
-	public RedisEnterpriseContainer(final String tag) {
-		this(DEFAULT_IMAGE_NAME.withTag(tag));
+	public RedisEnterpriseContainer(String dockerImageName) {
+		this(DockerImageName.parse(dockerImageName));
 	}
 
 	public RedisEnterpriseContainer(final DockerImageName dockerImageName) {
@@ -101,7 +94,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 			admin.waitForBoostrap();
 			createCluster();
 			if (!database.getModules().isEmpty()) {
-				installModules(admin, database.getModules());
+				checkInstalledModules(admin, database.getModules());
 			}
 			Database response = admin.createDatabase(database);
 			log.info("Created database {} with UID {}", response.getName(), response.getUid());
@@ -157,30 +150,20 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 		}
 	}
 
-	private static void installModules(Admin admin, List<ModuleConfig> modules) throws IOException {
+	private void checkInstalledModules(Admin admin, List<ModuleConfig> modules) throws IOException {
 		Map<String, InstalledModule> installedModules = admin.getModules().stream()
 				.collect(Collectors.toMap(InstalledModule::getName, m -> m));
-		for (ModuleConfig moduleConfig : modules) {
-			if (installedModules.containsKey(moduleConfig.getName())) {
-				continue;
-			}
-			if (RedisModule.GEARS.getModuleName().equals(moduleConfig.getName())) {
-				try (InputStream inputStream = RedisEnterpriseContainer.class.getClassLoader()
-						.getResourceAsStream(GEARS_MODULE_FILE)) {
-					admin.installModule(GEARS_MODULE_FILE, inputStream);
-				} catch (Exception e) {
-					throw new ContainerLaunchException(
-							String.format("Could not install module %s", moduleConfig.getName()), e);
-				}
-			} else {
-				log.error("Could not find any module named '{}' on Redis Enterprise cluster", moduleConfig.getName());
-			}
-		}
+		modules.stream().map(ModuleConfig::getName).filter(Predicate.not(installedModules::containsKey))
+				.forEach(this::logModuleNotInstalled);
+	}
+
+	private void logModuleNotInstalled(String moduleName) {
+		log.error("Could not find any module named '{}' on Redis Enterprise cluster", moduleName);
 	}
 
 	@Override
 	public String getRedisURI() {
-		return RedisServer.redisURI(getHost(), database.getPort());
+		return redisURI(getHost(), database.getPort());
 	}
 
 	@Override
@@ -190,7 +173,7 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 
 	@Override
 	public String toString() {
-		return RedisServer.toString(this);
+		return ClassUtils.getShortClassName(RedisEnterpriseContainer.class);
 	}
 
 	private boolean isRunning(InspectContainerResponse containerInfo) {
@@ -219,11 +202,6 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 			return false;
 		RedisEnterpriseContainer other = (RedisEnterpriseContainer) obj;
 		return Objects.equals(database, other.database);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return RedisServer.isEnabled(ENV_ENABLED_SUFFIX);
 	}
 
 }

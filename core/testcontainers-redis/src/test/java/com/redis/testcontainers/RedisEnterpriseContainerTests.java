@@ -15,7 +15,7 @@ class RedisEnterpriseContainerTests extends AbstractModulesTestBase {
 					.modules(RedisModule.SEARCH, RedisModule.TIMESERIES).build());
 
 	@Override
-	protected RedisServer getRedisServer() {
+	protected RedisEnterpriseContainer getRedisContainer() {
 		return redisEnterprise;
 	}
 

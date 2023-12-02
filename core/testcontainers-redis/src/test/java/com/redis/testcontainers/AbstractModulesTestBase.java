@@ -30,23 +30,23 @@ import io.lettuce.core.AbstractRedisClient;
 @SuppressWarnings("unchecked")
 abstract class AbstractModulesTestBase {
 
-	private RedisServer redis;
+	private AbstractRedisContainer<?> redis;
 	private AbstractRedisClient client;
 	private StatefulRedisModulesConnection<String, String> connection;
 	private RedisModulesCommands<String, String> commands;
 
-	protected abstract RedisServer getRedisServer();
+	protected abstract AbstractRedisContainer<?> getRedisContainer();
 
 	@BeforeAll
 	public void setup() {
-		redis = getRedisServer();
+		redis = getRedisContainer();
 		redis.start();
 		client = client(redis);
 		connection = RedisModulesUtils.connection(client);
 		commands = connection.sync();
 	}
 
-	private AbstractRedisClient client(RedisServer redis) {
+	private AbstractRedisClient client(AbstractRedisContainer<?> redis) {
 		if (redis.isCluster()) {
 			return RedisModulesClusterClient.create(redis.getRedisURI());
 		}

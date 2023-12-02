@@ -1,22 +1,13 @@
 package com.redis.testcontainers;
 
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang3.ClassUtils;
 import org.testcontainers.utility.DockerImageName;
 
-abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> extends GenericContainer<C>
-		implements RedisServer {
-
-	public static final int REDIS_PORT = 6379;
+public abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> extends GenericContainer<C> {
 
 	protected AbstractRedisContainer(final DockerImageName dockerImageName) {
-		this(dockerImageName, REDIS_PORT);
-	}
-
-	protected AbstractRedisContainer(final DockerImageName dockerImageName, int port) {
 		super(dockerImageName);
-		withExposedPorts(port);
-		waitingFor(Wait.forLogMessage(".*Ready to accept connections.*\\n", 1));
 	}
 
 	/**
@@ -24,14 +15,17 @@ abstract class AbstractRedisContainer<C extends AbstractRedisContainer<C>> exten
 	 *
 	 * @return Redis URI.
 	 */
-	@Override
-	public String getRedisURI() {
-		return RedisServer.redisURI(this);
+	public abstract String getRedisURI();
+	
+	public abstract boolean isCluster();
+	
+	protected String redisURI(String host, int port) {
+		return "redis://" + host + ":" + port;
 	}
 
 	@Override
 	public String toString() {
-		return RedisServer.toString(this);
+		return ClassUtils.getShortClassName(getClass());
 	}
 
 }
