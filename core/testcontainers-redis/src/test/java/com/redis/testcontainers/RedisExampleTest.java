@@ -12,18 +12,19 @@ import io.lettuce.core.api.sync.RedisCommands;
 @Testcontainers
 class RedisExampleTest {
 
-	@Container
-	private static RedisContainer container = new RedisContainer(
-			RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
+    @Container
+    private static RedisContainer container = new RedisContainer(
+            RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
 
-	@Test
-	void testSomethingUsingLettuce() {
-		// Retrieve the Redis URI from the container
-		String redisURI = container.getRedisURI();
-		RedisClient client = RedisClient.create(redisURI);
-		try (StatefulRedisConnection<String, String> connection = client.connect()) {
-			RedisCommands<String, String> commands = connection.sync();
-			Assertions.assertEquals("PONG", commands.ping());
-		}
-	}
+    @Test
+    void testSomethingUsingLettuce() {
+        // Retrieve the Redis URI from the container
+        String redisURI = container.getRedisURI();
+        RedisClient client = RedisClient.create(redisURI);
+        try (StatefulRedisConnection<String, String> connection = client.connect()) {
+            RedisCommands<String, String> commands = connection.sync();
+            Assertions.assertEquals("PONG", commands.ping());
+        }
+    }
+
 }

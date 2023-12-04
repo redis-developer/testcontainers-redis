@@ -12,8 +12,8 @@ import com.redis.lettucemod.search.Field;
 import com.redis.lettucemod.search.IndexInfo;
 import com.redis.lettucemod.util.RedisModulesUtils;
 
-@Testcontainers
 @SuppressWarnings("unchecked")
+@Testcontainers
 class RedisStackExampleTest {
 
 	@Container
