@@ -14,7 +14,8 @@ Testcontainers Redis is an extension of Testcontainers that supports Redis (Stan
 
 == Getting Started
 
-.Gradle
+=== Gradle
+
 [source,groovy,subs="+attributes"]
 ----
 dependencies {
@@ -22,7 +23,8 @@ dependencies {
 }
 ----
 
-.Maven
+=== Maven
+
 [source,xml,subs="+attributes"]
 ----
 <dependency>
@@ -35,7 +37,8 @@ dependencies {
 
 == Usage
 
-.Redis Example
+=== Redis Example
+
 [source,java]
 ----
 @Testcontainers
@@ -58,7 +61,8 @@ class RedisExampleTest {
 }
 ----
 
-.Redis Stack Example
+=== Redis Stack Example
+
 [source,java]
 ----
 @Testcontainers
