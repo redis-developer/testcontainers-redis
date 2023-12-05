@@ -2,24 +2,25 @@ config {
     info {
         description = 'Testcontainers Redis'
         inceptionYear = '2020'
+        vendor = 'Redis'
         tags = ['testcontainers', 'redis']
-        
+
         links {
             website      = "https://github.com/redis-developer/${project.rootProject.name}"
             issueTracker = "https://github.com/redis-developer/${project.rootProject.name}/issues"
             scm          = "https://github.com/redis-developer/${project.rootProject.name}.git"
         }
-        
+
         scm {
             url                 = "https://github.com/redis-developer/${project.rootProject.name}"
             connection          = "scm:git:https://github.com/redis-developer/${project.rootProject.name}.git"
             developerConnection = "scm:git:git@github.com:redis-developer/${project.rootProject.name}.git"
         }
-        
+
         specification {
             enabled = true
         }
-        
+
         implementation {
             enabled = true
         }
@@ -32,7 +33,7 @@ config {
             }
         }
     }
-    
+
     docs {
         javadoc {
             autoLinks {
@@ -43,13 +44,8 @@ config {
     
     licensing {
         enabled = false
-        licenses {
-            license {
-                id = 'Apache-2.0'
-            }
-        }
     }
-    
+
     coverage {
         jacoco {
             enabled = true
@@ -63,11 +59,11 @@ allprojects {
         mavenLocal()
         gradlePluginPortal()
     }
-    
+
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
     }
-    
+
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
@@ -79,35 +75,21 @@ subprojects {
             description = project.project_description
         }
         coverage {
-		    jacoco {
+            jacoco {
 		        toolVersion = jacocoVersion
-		    }
-		}
+            }
+        }
     }
     
     license {
         exclude('build/**')
     }
-    
+
     test {
         useJUnitPlatform()
     }
 
-    bootJar {
-        enabled = false
+    compileJava {
+        options.release = 8
     }
-    
-    jar {
-        enabled = true
-        archiveClassifier = ''
-    }
-    
-    configurations.all {
-		resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-			if (details.requested.name == 'lettuce-core' ) {
-				details.useVersion lettuceVersion
-			}
-		}
-	}
-
 }
