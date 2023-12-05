@@ -153,7 +153,8 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 	private void checkInstalledModules(Admin admin, List<ModuleConfig> modules) throws IOException {
 		Map<String, InstalledModule> installedModules = admin.getModules().stream()
 				.collect(Collectors.toMap(InstalledModule::getName, m -> m));
-		modules.stream().map(ModuleConfig::getName).filter(Predicate.not(installedModules::containsKey))
+		Predicate<String> notInstalledPredicate = ((Predicate<String>)installedModules::containsKey).negate();
+		modules.stream().map(ModuleConfig::getName).filter(notInstalledPredicate)
 				.forEach(this::logModuleNotInstalled);
 	}
 
