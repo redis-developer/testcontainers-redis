@@ -2,11 +2,7 @@ package com.redis.testcontainers;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +23,6 @@ import com.github.dockerjava.api.command.InspectExecResponse;
 import com.github.dockerjava.api.exception.DockerException;
 import com.redis.enterprise.Admin;
 import com.redis.enterprise.Database;
-import com.redis.enterprise.Database.ModuleConfig;
-import com.redis.enterprise.rest.InstalledModule;
 
 public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterpriseContainer> {
 
@@ -93,9 +87,6 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 			log.info("Waiting for cluster bootstrap");
 			admin.waitForBoostrap();
 			createCluster();
-			if (!database.getModules().isEmpty()) {
-				checkInstalledModules(admin, database.getModules());
-			}
 			Database response = admin.createDatabase(database);
 			log.info("Created database {} with UID {}", response.getName(), response.getUid());
 		} catch (Exception e) {
@@ -148,18 +139,6 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 		} catch (IOException e) {
 			log.error("Could not close result callback", e);
 		}
-	}
-
-	private void checkInstalledModules(Admin admin, List<ModuleConfig> modules) throws IOException {
-		Map<String, InstalledModule> installedModules = admin.getModules().stream()
-				.collect(Collectors.toMap(InstalledModule::getName, m -> m));
-		Predicate<String> notInstalledPredicate = ((Predicate<String>)installedModules::containsKey).negate();
-		modules.stream().map(ModuleConfig::getName).filter(notInstalledPredicate)
-				.forEach(this::logModuleNotInstalled);
-	}
-
-	private void logModuleNotInstalled(String moduleName) {
-		log.error("Could not find any module named '{}' on Redis Enterprise cluster", moduleName);
 	}
 
 	@Override
