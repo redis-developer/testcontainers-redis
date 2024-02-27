@@ -89,7 +89,4 @@ subprojects {
         useJUnitPlatform()
     }
 
-    compileJava {
-        options.release = 8
-    }
 }

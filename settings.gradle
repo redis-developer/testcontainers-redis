@@ -5,6 +5,8 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
+        classpath "io.spring.gradle:dependency-management-plugin:$dependencyPluginVersion"
         classpath "org.kordamp.gradle:java-project-gradle-plugin:$kordampPluginVersion"
         classpath "org.kordamp.gradle:jacoco-gradle-plugin:$kordampPluginVersion"
         classpath "org.kordamp.gradle:kordamp-parentbuild:$kordampBuildVersion"
@@ -13,39 +15,19 @@ buildscript {
 
 apply plugin: 'org.kordamp.gradle.kordamp-parentbuild'
 
-rootProject.name = 'testcontainers-redis'
+rootProject.name = 'testcontainers-redis-root'
 
 projects {
     directories = ['core']
 
     plugins {
-        all {
-            id 'eclipse'
-        }
         path(':') {
             id 'org.kordamp.gradle.java-project'
         }
         dirs(['core']) {
             id 'java-library'
+            id 'org.springframework.boot'
+            id 'io.spring.dependency-management'
         }
-    }
-}
-
-enforce {
-    rule(enforcer.rules.BanDuplicateClasses) { r ->
-        // search only on compile and runtime classpaths
-        r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
-    }
-    rule(enforcer.rules.ForceDependencies) { r ->
-        r.dependencies.addAll "com.redis:lettucemod:$lettucemodVersion",
-            "org.slf4j:slf4j-api:$slf4jVersion",
-            "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
-            "com.fasterxml.jackson.core:jackson-bom:$jacksonVersion",
-            "com.fasterxml.jackson.core:jackson-core:$jacksonVersion",
-            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-            "org.junit:junit-bom:$junitVersion",
-            "org.junit.platform:junit-platform-engine:$junitPlatformVersion",
-            "org.junit.platform:junit-platform-commons:$junitPlatformVersion",
-            "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"
     }
 }

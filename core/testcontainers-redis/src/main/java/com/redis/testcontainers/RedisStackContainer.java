@@ -2,7 +2,7 @@ package com.redis.testcontainers;
 
 import org.testcontainers.utility.DockerImageName;
 
-public class RedisStackContainer extends AbstractRedisServerContainer<RedisStackContainer> {
+public class RedisStackContainer extends AbstractRedisContainer<RedisStackContainer> {
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redis/redis-stack-server");
 

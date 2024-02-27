@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.ContainerLaunchException;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.ToStringConsumer;
@@ -24,34 +25,21 @@ import com.github.dockerjava.api.exception.DockerException;
 import com.redis.enterprise.Admin;
 import com.redis.enterprise.Database;
 
-public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterpriseContainer> {
-
-	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
-
-	public static final String ADMIN_USERNAME = "testcontainers@redis.com";
-
-	public static final String ADMIN_PASSWORD = "redis123";
+public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseContainer> implements RedisServer {
 
 	public static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("redislabs/redis");
-
 	public static final String DEFAULT_TAG = "latest";
-
-	public static final int ADMIN_PORT = 8443;
-
+	public static final int DEFAULT_DATABASE_SHARD_COUNT = 2;
 	public static final int DEFAULT_DATABASE_PORT = 12000;
 
+	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
-
-	private static final int DEFAULT_SHARD_COUNT = 2;
-
-	private static final String DEFAULT_DATABASE_NAME = "testcontainers";
-
 	private static final String RLADMIN = "/opt/redislabs/bin/rladmin";
-
 	private static final Long EXIT_CODE_SUCCESS = 0L;
+	private static final int WEB_UI_PORT = 8443;
 
-	private Database database = Database.name(DEFAULT_DATABASE_NAME).shardCount(DEFAULT_SHARD_COUNT)
-			.port(DEFAULT_DATABASE_PORT).build();
+	private Database database = Database.builder().shardCount(DEFAULT_DATABASE_SHARD_COUNT).port(DEFAULT_DATABASE_PORT)
+			.build();
 
 	public RedisEnterpriseContainer(String dockerImageName) {
 		this(DockerImageName.parse(dockerImageName));
@@ -60,7 +48,7 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 	public RedisEnterpriseContainer(final DockerImageName dockerImageName) {
 		super(dockerImageName);
 		addFixedExposedPort(Admin.DEFAULT_PORT, Admin.DEFAULT_PORT);
-		addFixedExposedPort(ADMIN_PORT, ADMIN_PORT);
+		addFixedExposedPort(WEB_UI_PORT, WEB_UI_PORT);
 		addFixedExposedPort(database.getPort(), database.getPort());
 		withPrivilegedMode(true);
 		waitingFor(Wait.forLogMessage(".*success: job_scheduler entered RUNNING state, process has stayed up for.*\\n",
@@ -79,11 +67,16 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 		return this;
 	}
 
+	private Admin admin() {
+		Admin admin = new Admin();
+		admin.withHost(getRedisHost());
+		return admin;
+	}
+
 	@Override
 	protected void containerIsStarted(InspectContainerResponse containerInfo) {
 		super.containerIsStarted(containerInfo);
-		try (Admin admin = new Admin(ADMIN_USERNAME, ADMIN_PASSWORD.toCharArray())) {
-			admin.setHost(getHost());
+		try (Admin admin = admin()) {
 			log.info("Waiting for cluster bootstrap");
 			admin.waitForBoostrap();
 			createCluster();
@@ -113,7 +106,7 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 		DockerClient dockerClient = DockerClientFactory.instance().client();
 
 		String[] commands = new String[] { RLADMIN, "cluster", "create", "name", "cluster.local", "username",
-				ADMIN_USERNAME, "password", ADMIN_PASSWORD, "external_addr", NODE_EXTERNAL_ADDR };
+				Admin.DEFAULT_USER_NAME, "password", Admin.DEFAULT_PASSWORD, "external_addr", NODE_EXTERNAL_ADDR };
 		log.debug("{}: Running \"exec\" command: {}", containerName, commands);
 		final ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
 				.withAttachStdout(true).withAttachStderr(true).withCmd(commands).withPrivileged(true).exec();
@@ -142,12 +135,7 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 	}
 
 	@Override
-	public String getRedisURI() {
-		return redisURI(getHost(), database.getPort());
-	}
-
-	@Override
-	public boolean isCluster() {
+	public boolean isRedisCluster() {
 		return database.isOssCluster();
 	}
 
@@ -162,6 +150,16 @@ public class RedisEnterpriseContainer extends AbstractRedisContainer<RedisEnterp
 		} catch (DockerException e) {
 			return false;
 		}
+	}
+
+	@Override
+	public String getRedisHost() {
+		return getHost();
+	}
+
+	@Override
+	public int getRedisPort() {
+		return database.getPort();
 	}
 
 	@Override

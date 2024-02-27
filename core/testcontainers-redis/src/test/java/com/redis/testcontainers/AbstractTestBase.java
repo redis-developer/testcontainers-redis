@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.lifecycle.Startable;
 
 import com.redis.lettucemod.RedisModulesClient;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
@@ -28,26 +29,28 @@ import io.lettuce.core.AbstractRedisClient;
 @Testcontainers
 @TestInstance(Lifecycle.PER_CLASS)
 @SuppressWarnings("unchecked")
-abstract class AbstractModulesTestBase {
+abstract class AbstractTestBase {
 
-	private AbstractRedisContainer<?> redis;
+	private RedisServer redis;
 	private AbstractRedisClient client;
 	private StatefulRedisModulesConnection<String, String> connection;
 	private RedisModulesCommands<String, String> commands;
 
-	protected abstract AbstractRedisContainer<?> getRedisContainer();
+	protected abstract RedisServer getRedisServer();
 
 	@BeforeAll
 	public void setup() {
-		redis = getRedisContainer();
-		redis.start();
+		redis = getRedisServer();
+		if (redis instanceof Startable) {
+			((Startable) redis).start();
+		}
 		client = client(redis);
 		connection = RedisModulesUtils.connection(client);
 		commands = connection.sync();
 	}
 
-	private AbstractRedisClient client(AbstractRedisContainer<?> redis) {
-		if (redis.isCluster()) {
+	private AbstractRedisClient client(RedisServer redis) {
+		if (redis.isRedisCluster()) {
 			return RedisModulesClusterClient.create(redis.getRedisURI());
 		}
 		return RedisModulesClient.create(redis.getRedisURI());
@@ -58,7 +61,9 @@ abstract class AbstractModulesTestBase {
 		commands = null;
 		connection.close();
 		client.close();
-		redis.stop();
+		if (redis instanceof Startable) {
+			((Startable) redis).stop();
+		}
 	}
 
 	@BeforeEach
