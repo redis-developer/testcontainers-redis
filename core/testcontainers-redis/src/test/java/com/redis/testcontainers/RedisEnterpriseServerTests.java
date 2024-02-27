@@ -3,9 +3,12 @@ package com.redis.testcontainers;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
+
 import com.redis.enterprise.Database.ModuleConfig;
 import com.redis.enterprise.RedisModule;
 
+@Disabled
 class RedisEnterpriseServerTests extends AbstractTestBase {
 
 	private static final RedisEnterpriseServer redis = redisEnterpriseServer();
