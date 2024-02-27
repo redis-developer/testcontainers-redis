@@ -59,8 +59,12 @@ abstract class AbstractTestBase {
 	@AfterAll
 	public void teardown() {
 		commands = null;
-		connection.close();
-		client.close();
+		if (connection != null) {
+			connection.close();
+		}
+		if (client != null) {
+			client.close();
+		}
 		if (redis instanceof Startable) {
 			((Startable) redis).stop();
 		}

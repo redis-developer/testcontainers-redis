@@ -1,7 +1,7 @@
 package com.redis.testcontainers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.lifecycle.Startable;
 
@@ -18,19 +18,21 @@ public class RedisEnterpriseServer implements RedisServer, Startable {
 	public static final int DEFAULT_DATABASE_SHARD_COUNT = 2;
 	public static final String DEFAULT_DATABASE_NAME = "testcontainers";
 
-	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseServer.class);
-
 	private String host = DEFAULT_HOST;
 	private int adminPort = DEFAULT_ADMIN_PORT;
 	private String adminUsername = DEFAULT_ADMIN_USERNAME;
 	private String adminPassword = DEFAULT_ADMIN_PASSWORD;
-
 	private Database database = defaultDatabase().build();
 
 	private Database runningDatabase;
+	private Admin admin;
 
 	public Database getDatabase() {
 		return database;
+	}
+
+	public Admin getAdmin() {
+		return admin;
 	}
 
 	public static Database.Builder defaultDatabase() {
@@ -86,41 +88,45 @@ public class RedisEnterpriseServer implements RedisServer, Startable {
 
 	@Override
 	public int getRedisPort() {
-		return database.getPort();
+		return runningDatabase.getPort();
 	}
 
 	@Override
 	public boolean isRedisCluster() {
-		return database.isOssCluster();
+		return runningDatabase.isOssCluster();
 	}
 
 	@Override
 	public synchronized void start() {
+		if (admin == null) {
+			admin = new Admin();
+			admin.withUserName(adminUsername);
+			admin.withPassword(adminPassword);
+			admin.withHost(host);
+		}
 		if (runningDatabase == null) {
-			try (Admin admin = admin()) {
+			try {
+				admin.getDatabases().stream().filter(d -> d.getName().equals(database.getName())).map(Database::getUid)
+						.forEach(admin::deleteDatabase);
 				runningDatabase = admin.createDatabase(database);
-				log.info("Created database {} with UID {}", runningDatabase.getName(), runningDatabase.getUid());
 			} catch (Exception e) {
 				throw new ContainerLaunchException("Could not initialize Redis Enterprise database", e);
 			}
 		}
 	}
 
-	private Admin admin() {
-		Admin admin = new Admin();
-		admin.withUserName(adminUsername);
-		admin.withPassword(adminPassword);
-		admin.withHost(host);
-		return admin;
-	}
-
 	@Override
 	public synchronized void stop() {
 		if (runningDatabase != null) {
-			try (Admin admin = admin()) {
-				admin.deleteDatabase(runningDatabase.getUid());
-			} catch (Exception e) {
-				throw new ContainerLaunchException("Could not tear down Redis Enterprise database", e);
+			admin.deleteDatabase(runningDatabase.getUid());
+			runningDatabase = null;
+		}
+		if (admin != null) {
+			try {
+				admin.close();
+				admin = null;
+			} catch (IOException e) {
+				throw new ContainerLaunchException("Could not close Redis Enterprise admin", e);
 			}
 		}
 	}
