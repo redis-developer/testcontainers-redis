@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startable;
 
 import com.redis.lettucemod.RedisModulesClient;
@@ -26,7 +25,6 @@ import com.redis.lettucemod.util.RedisModulesUtils;
 
 import io.lettuce.core.AbstractRedisClient;
 
-@Testcontainers
 @TestInstance(Lifecycle.PER_CLASS)
 @SuppressWarnings("unchecked")
 abstract class AbstractTestBase {

@@ -1,24 +1,22 @@
 package com.redis.testcontainers;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
-import com.redis.enterprise.Database.ModuleConfig;
-import com.redis.enterprise.RedisModule;
+import com.redis.enterprise.Database;
 
+@EnabledIfEnvironmentVariable(named = RedisEnterpriseServer.ENV_HOST, matches = ".*")
 class RedisEnterpriseServerTests extends AbstractTestBase {
 
-	private static final RedisEnterpriseServer redis = redisEnterpriseServer();
+	private static final RedisEnterpriseServer server = new RedisEnterpriseServer().withDatabase(database());
 
+	private static Database database() {
+		Database database = RedisEnterpriseContainer.defaultDatabase();
+		database.setPort(12001);
+		return database;
+	}
+	
 	@Override
 	protected RedisEnterpriseServer getRedisServer() {
-		return redis;
-	}
-
-	private static RedisEnterpriseServer redisEnterpriseServer() {
-		RedisEnterpriseServer server = new RedisEnterpriseServer();
-		server.getDatabase().setModules(Stream.of(RedisModule.JSON, RedisModule.SEARCH, RedisModule.TIMESERIES)
-				.map(RedisModule::getModuleName).map(ModuleConfig::new).collect(Collectors.toList()));
 		return server;
 	}
 

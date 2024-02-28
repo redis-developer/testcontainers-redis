@@ -1,6 +1,7 @@
 package com.redis.testcontainers;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.lifecycle.Startable;
@@ -10,22 +11,40 @@ import com.redis.enterprise.Database;
 
 public class RedisEnterpriseServer implements RedisServer, Startable {
 
+	private static final String ENV_PREFIX = "REDIS_ENTERPRISE_";
+	public static final String ENV_HOST = ENV_PREFIX + "HOST";
+	public static final String ENV_USER = ENV_PREFIX + "USER";
+	public static final String ENV_PASSWORD = ENV_PREFIX + "PASSWORD";
+	public static final String ENV_PORT = ENV_PREFIX + "PORT";
 	public static final String DEFAULT_HOST = "localhost";
-	public static final String DEFAULT_ADMIN_USERNAME = "admin@redis.com";
-	public static final String DEFAULT_ADMIN_PASSWORD = "redis123";
-	public static final int DEFAULT_ADMIN_PORT = 8443;
-	public static final int DEFAULT_DATABASE_PORT = 12000;
-	public static final int DEFAULT_DATABASE_SHARD_COUNT = 2;
-	public static final String DEFAULT_DATABASE_NAME = "testcontainers";
+	public static final String DEFAULT_USER = "admin@redis.com";
+	public static final String DEFAULT_PASSWORD = "redis123";
+	public static final int DEFAULT_PORT = 8443;
 
-	private String host = DEFAULT_HOST;
-	private int adminPort = DEFAULT_ADMIN_PORT;
-	private String adminUsername = DEFAULT_ADMIN_USERNAME;
-	private String adminPassword = DEFAULT_ADMIN_PASSWORD;
-	private Database database = defaultDatabase().build();
+	private String host = getenv(ENV_HOST, DEFAULT_HOST);
+	private int adminPort = getenvInt(ENV_PORT, DEFAULT_PORT);
+	private String adminUsername = getenv(ENV_USER, DEFAULT_USER);
+	private String adminPassword = getenv(ENV_PASSWORD, DEFAULT_PASSWORD);
+	private Database database = RedisEnterpriseContainer.defaultDatabase();
 
 	private Database runningDatabase;
 	private Admin admin;
+
+	private static String getenv(String name, String defaultValue) {
+		return getenv(name).orElse(defaultValue);
+	}
+
+	private static Optional<String> getenv(String name) {
+		String value = System.getenv(name);
+		if (value == null || value.length() == 0) {
+			return Optional.empty();
+		}
+		return Optional.of(value);
+	}
+
+	private static int getenvInt(String name, int defaultValue) {
+		return getenv(name).map(Integer::parseInt).orElse(defaultValue);
+	}
 
 	public Database getDatabase() {
 		return database;
@@ -33,11 +52,6 @@ public class RedisEnterpriseServer implements RedisServer, Startable {
 
 	public Admin getAdmin() {
 		return admin;
-	}
-
-	public static Database.Builder defaultDatabase() {
-		return Database.builder().name(DEFAULT_DATABASE_NAME).shardCount(DEFAULT_DATABASE_SHARD_COUNT)
-				.port(DEFAULT_DATABASE_PORT);
 	}
 
 	public RedisEnterpriseServer withDatabase(Database database) {

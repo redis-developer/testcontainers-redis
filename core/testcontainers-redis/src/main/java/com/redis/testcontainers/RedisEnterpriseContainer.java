@@ -24,6 +24,7 @@ import com.github.dockerjava.api.command.InspectExecResponse;
 import com.github.dockerjava.api.exception.DockerException;
 import com.redis.enterprise.Admin;
 import com.redis.enterprise.Database;
+import com.redis.enterprise.RedisModule;
 
 public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseContainer> implements RedisServer {
 
@@ -31,6 +32,9 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	public static final String DEFAULT_TAG = "latest";
 	public static final int DEFAULT_DATABASE_SHARD_COUNT = 2;
 	public static final int DEFAULT_DATABASE_PORT = 12000;
+	public static final String DEFAULT_DATABASE_NAME = "testcontainers";
+	public static final RedisModule[] DEFAULT_DATABASE_MODULES = { RedisModule.JSON, RedisModule.SEARCH,
+			RedisModule.TIMESERIES, RedisModule.BLOOM };
 
 	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
 	private static final String NODE_EXTERNAL_ADDR = "0.0.0.0";
@@ -38,8 +42,12 @@ public class RedisEnterpriseContainer extends GenericContainer<RedisEnterpriseCo
 	private static final Long EXIT_CODE_SUCCESS = 0L;
 	private static final int WEB_UI_PORT = 8443;
 
-	private Database database = Database.builder().shardCount(DEFAULT_DATABASE_SHARD_COUNT).port(DEFAULT_DATABASE_PORT)
-			.build();
+	private Database database = defaultDatabase();
+
+	public static Database defaultDatabase() {
+		return Database.builder().name(DEFAULT_DATABASE_NAME).shardCount(DEFAULT_DATABASE_SHARD_COUNT)
+				.port(DEFAULT_DATABASE_PORT).ossCluster(true).modules(DEFAULT_DATABASE_MODULES).build();
+	}
 
 	public RedisEnterpriseContainer(String dockerImageName) {
 		this(DockerImageName.parse(dockerImageName));
