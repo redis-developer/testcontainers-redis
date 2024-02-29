@@ -31,3 +31,13 @@ projects {
         }
     }
 }
+
+enforce {
+    rule(enforcer.rules.RequireJavaVersion) { r ->
+        r.version.set('17')
+    }
+    rule(enforcer.rules.BanDuplicateClasses) { r ->
+        // search only on compile and runtime classpaths
+        r.configurations.addAll(['compileClasspath', 'runtimeClasspath'])
+    }
+}
