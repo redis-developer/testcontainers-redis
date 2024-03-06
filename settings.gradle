@@ -15,12 +15,15 @@ buildscript {
 
 apply plugin: 'org.kordamp.gradle.kordamp-parentbuild'
 
-rootProject.name = 'testcontainers-redis-root'
+rootProject.name = 'testcontainers-redis'
 
 projects {
     directories = ['core']
 
     plugins {
+        all {
+            id 'eclipse'
+        }
         path(':') {
             id 'org.kordamp.gradle.java-project'
         }

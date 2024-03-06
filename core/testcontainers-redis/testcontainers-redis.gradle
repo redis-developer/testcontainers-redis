@@ -18,3 +18,9 @@ jar {
     enabled = true
     archiveClassifier = ''
 }
+
+eclipse {
+    project {
+        name = 'testcontainers-redis-core'
+    }
+}
