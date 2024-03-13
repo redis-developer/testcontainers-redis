@@ -1,3 +1,5 @@
+ext['testcontainers.version'] = "$testcontainersVersion"
+
 dependencies {
     api 'org.testcontainers:testcontainers'
     api group: 'com.redis', name: 'redis-enterprise-admin', version: adminVersion
