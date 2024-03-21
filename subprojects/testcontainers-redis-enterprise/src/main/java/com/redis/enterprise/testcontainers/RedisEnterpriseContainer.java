@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.utility.DockerImageName;
 
 import com.redis.enterprise.Admin;
@@ -15,7 +16,7 @@ public class RedisEnterpriseContainer extends AbstractRedisEnterpriseContainer<R
 	public static final int DEFAULT_DATABASE_SHARD_COUNT = 2;
 	public static final int DEFAULT_DATABASE_PORT = 12000;
 	public static final String DEFAULT_DATABASE_NAME = "testcontainers";
-	public static final RedisModule[] DEFAULT_DATABASE_MODULES = { RedisModule.JSON, RedisModule.SEARCH,
+	protected static final RedisModule[] DEFAULT_DATABASE_MODULES = { RedisModule.JSON, RedisModule.SEARCH,
 			RedisModule.TIMESERIES, RedisModule.BLOOM };
 
 	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
@@ -67,11 +68,16 @@ public class RedisEnterpriseContainer extends AbstractRedisEnterpriseContainer<R
 	}
 
 	@Override
-	protected void createCluster() throws Exception {
+	protected void createCluster() {
 		log.info("Waiting for cluster bootstrap");
 		admin.waitForBoostrap();
 		super.createCluster();
-		Database response = admin.createDatabase(database);
+		Database response;
+		try {
+			response = admin.createDatabase(database);
+		} catch (Exception e) {
+			throw new ContainerLaunchException("Could not create database", e);
+		}
 		log.info("Created database {} with UID {}", response.getName(), response.getUid());
 	}
 

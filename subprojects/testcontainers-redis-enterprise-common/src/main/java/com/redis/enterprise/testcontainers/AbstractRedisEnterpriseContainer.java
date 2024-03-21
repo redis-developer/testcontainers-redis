@@ -58,7 +58,7 @@ public abstract class AbstractRedisEnterpriseContainer<T extends AbstractRedisEn
 		}
 	}
 
-	protected void createCluster() throws Exception {
+	protected void createCluster() {
 		log.info("Creating cluster");
 		if (!TestEnvironment.dockerExecutionDriverSupportsExec()) {
 			// at time of writing, this is the expected result in CircleCI.
