@@ -74,7 +74,7 @@ public class Admin implements AutoCloseable {
 	private static final String CONTENT_TYPE_JSON = "application/json";
 	private static final String V1 = "/v1/";
 	private static final CharSequence PATH_SEPARATOR = "/";
-	private static final Duration DEFAULT_DATABASE_CREATION_TIMEOUT = Duration.ofSeconds(10);
+	private static final Duration DEFAULT_DATABASE_CREATION_TIMEOUT = Duration.ofSeconds(30);
 	private static final Duration DEFAULT_DATABASE_CREATION_POLL_INTERVAL = Duration.ofSeconds(1);
 
 	private final ObjectMapper objectMapper = new ObjectMapper()
@@ -235,8 +235,7 @@ public class Admin implements AutoCloseable {
 				objectMapper.getTypeFactory().constructCollectionType(List.class, InstalledModule.class));
 	}
 
-	public Database createDatabase(Database database)
-			throws IOException, GeneralSecurityException, InterruptedException {
+	public Database createDatabase(Database database) throws IOException, GeneralSecurityException {
 		Map<String, InstalledModule> installedModules = new HashMap<>();
 		for (InstalledModule module : getModules()) {
 			installedModules.put(module.getName(), module);
