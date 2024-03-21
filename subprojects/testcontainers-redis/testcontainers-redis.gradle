@@ -1,0 +1,6 @@
+dependencies {
+    api 'org.testcontainers:testcontainers'
+    api project(':testcontainers-redis-common')
+    testImplementation group: 'com.redis', name: 'lettucemod', version: lettucemodVersion 
+    testImplementation project(':testcontainers-redis-test')
+}

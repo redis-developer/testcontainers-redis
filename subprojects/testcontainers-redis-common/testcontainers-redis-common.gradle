@@ -1,0 +1,11 @@
+config {
+    testing {
+        jar = true
+    }
+}
+
+dependencies {
+    testImplementation group: 'com.redis', name: 'lettucemod', version: lettucemodVersion
+    testImplementation 'org.awaitility:awaitility'
+    testImplementation group: 'net.spy', name: 'spymemcached', version: spymemcachedVersion
+}
