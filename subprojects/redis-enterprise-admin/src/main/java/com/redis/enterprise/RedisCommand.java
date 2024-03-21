@@ -7,17 +7,17 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Command {
+public class RedisCommand {
 
-	private String name;
+	private String command;
 	private List<String> args = new ArrayList<>();
 
-	public String getName() {
-		return name;
+	public String getCommand() {
+		return command;
 	}
 
-	public void setName(String command) {
-		this.name = command;
+	public void setCommand(String command) {
+		this.command = command;
 	}
 
 	public List<String> getArgs() {
@@ -34,11 +34,11 @@ public class Command {
 
 	public static class Builder {
 
-		private final String name;
+		private final String command;
 		private List<String> args = new ArrayList<>();
 
 		public Builder(String name) {
-			this.name = name;
+			this.command = name;
 		}
 
 		public Builder args(String... args) {
@@ -46,11 +46,11 @@ public class Command {
 			return this;
 		}
 
-		public Command build() {
-			Command command = new Command();
-			command.setName(name);
-			command.setArgs(args);
-			return command;
+		public RedisCommand build() {
+			RedisCommand cmd = new RedisCommand();
+			cmd.setCommand(this.command);
+			cmd.setArgs(args);
+			return cmd;
 		}
 
 	}

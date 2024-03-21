@@ -66,7 +66,7 @@ public class Admin implements AutoCloseable {
 	public static final String DEFAULT_HOST = "localhost";
 	public static final int DEFAULT_PORT = 9443;
 
-	private static final Command PING = Command.name("PING").build();
+	private static final RedisCommand PING = RedisCommand.name("PING").build();
 	private static final String BOOTSTRAP = "bootstrap";
 	private static final String MODULES = "modules";
 	private static final String BDBS = "bdbs";
@@ -74,7 +74,7 @@ public class Admin implements AutoCloseable {
 	private static final String CONTENT_TYPE_JSON = "application/json";
 	private static final String V1 = "/v1/";
 	private static final CharSequence PATH_SEPARATOR = "/";
-	private static final Duration DEFAULT_DATABASE_CREATION_TIMEOUT = Duration.ofSeconds(30);
+	private static final Duration DEFAULT_DATABASE_CREATION_TIMEOUT = Duration.ofSeconds(10);
 	private static final Duration DEFAULT_DATABASE_CREATION_POLL_INTERVAL = Duration.ofSeconds(1);
 
 	private final ObjectMapper objectMapper = new ObjectMapper()
@@ -310,7 +310,7 @@ public class Admin implements AutoCloseable {
 		return get(v1(BOOTSTRAP), Bootstrap.class);
 	}
 
-	public CommandResponse executeCommand(long bdb, Command command) throws IOException, GeneralSecurityException {
+	public CommandResponse executeCommand(long bdb, RedisCommand command) throws IOException, GeneralSecurityException {
 		return post(v1(BDBS, String.valueOf(bdb), COMMAND), command, CommandResponse.class);
 	}
 
