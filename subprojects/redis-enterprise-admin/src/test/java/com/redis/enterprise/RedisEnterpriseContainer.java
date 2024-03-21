@@ -2,6 +2,7 @@ package com.redis.enterprise;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.utility.DockerImageName;
 
 import com.redis.enterprise.testcontainers.AbstractRedisEnterpriseContainer;
@@ -51,11 +52,16 @@ public class RedisEnterpriseContainer extends AbstractRedisEnterpriseContainer<R
 	}
 
 	@Override
-	protected void createCluster() throws Exception {
+	protected void createCluster() {
 		log.info("Waiting for cluster bootstrap");
 		admin.waitForBoostrap();
 		super.createCluster();
-		Database response = admin.createDatabase(database);
+		Database response;
+		try {
+			response = admin.createDatabase(database);
+		} catch (Exception e) {
+			throw new ContainerLaunchException("Could not create database", e);
+		}
 		log.info("Created database {} with UID {}", response.getName(), response.getUid());
 	}
 
