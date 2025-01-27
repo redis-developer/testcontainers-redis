@@ -2,7 +2,7 @@ name: 'Early Access'
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   earlyaccess:
@@ -11,8 +11,8 @@ jobs:
     uses: redis-field-engineering/redis-github-workflows/.github/workflows/early-access.yml@main
     with:
       jreleaser-arguments: full-release
-      java-version: 21
     secrets:
+      github-user: ${{ secrets.GIT_USER }}
       github-token: ${{ secrets.GIT_ACCESS_TOKEN }}
       gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
       gpg-public-key: ${{ secrets.GPG_PUBLIC_KEY }}
