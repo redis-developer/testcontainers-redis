@@ -13,17 +13,17 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.testcontainers.lifecycle.Startable;
 
 import com.redis.lettucemod.RedisModulesClient;
+import com.redis.lettucemod.RedisModulesUtils;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
 import com.redis.lettucemod.api.sync.RedisModulesCommands;
 import com.redis.lettucemod.cluster.RedisModulesClusterClient;
 import com.redis.lettucemod.search.Field;
 import com.redis.lettucemod.search.SearchResults;
 import com.redis.lettucemod.timeseries.CreateOptions;
-import com.redis.lettucemod.timeseries.Label;
 import com.redis.lettucemod.timeseries.Sample;
-import com.redis.lettucemod.util.RedisModulesUtils;
 
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.KeyValue;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @SuppressWarnings("unchecked")
@@ -96,7 +96,7 @@ public abstract class AbstractRedisTestBase {
 	void timeseries() {
 		// TimeSeries tests
 		commands.tsCreate("temperature:3:11", CreateOptions.<String, String>builder().retentionPeriod(6000)
-				.labels(Label.of("sensor_id", "2"), Label.of("area_id", "32")).build());
+				.labels(KeyValue.just("sensor_id", "2"), KeyValue.just("area_id", "32")).build());
 		// TS.ADD temperature:3:11 1548149181 30
 		Long add1 = commands.tsAdd("temperature:3:11", Sample.of(1548149181, 30));
 		Assertions.assertEquals(1548149181, add1);

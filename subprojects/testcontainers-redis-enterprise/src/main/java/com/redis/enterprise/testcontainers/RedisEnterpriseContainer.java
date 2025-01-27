@@ -17,7 +17,7 @@ public class RedisEnterpriseContainer extends AbstractRedisEnterpriseContainer<R
 	public static final int DEFAULT_DATABASE_PORT = 12000;
 	public static final String DEFAULT_DATABASE_NAME = "testcontainers";
 	protected static final RedisModule[] DEFAULT_DATABASE_MODULES = { RedisModule.JSON, RedisModule.SEARCH,
-			RedisModule.TIMESERIES, RedisModule.BLOOM };
+			RedisModule.TIMESERIES, RedisModule.PROBABILISTIC };
 
 	private static final Logger log = LoggerFactory.getLogger(RedisEnterpriseContainer.class);
 
