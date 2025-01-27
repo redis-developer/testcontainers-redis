@@ -3,27 +3,22 @@ project:
   description: Testcontainers Redis
   longDescription: Testcontainers extension for Redis, Redis Modules, and Redis Enterprise
   links:
-    homepage: https://github.com/redis-developer/testcontainers-redis
+    homepage: https://github.com/redis-field-engineering/testcontainers-redis
   authors:
     - Julien Ruaux
   license: Apache-2.0
-  java:
-    groupId: com.redis
-    version: '17'
-    multiProject: true
+  languages:
+    java:
+      groupId: com.redis
+      version: '17'
+      multiProject: true
   inceptionYear: '2020'
-  tags:
-    - 'redis'
-    - 'testcontainers'
-    - 'enterprise'
-    - 'junit'
-    - 'test'
-    - 'docker'
-    - 'container'
+  tags: ['redis', 'testcontainers', 'enterprise', 'junit', 'test', 'docker', 'container']
 
 release:
   github:
     overwrite: true
+    sign: true
     changelog:
       formatted: ALWAYS
       preset: conventional-commits

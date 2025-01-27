@@ -1,6 +1,6 @@
 = Testcontainers Redis
 :linkattrs:
-:project-owner:   redis-developer
+:project-owner:   redis-field-engineering
 :project-name:    testcontainers-redis
 :project-group:   com.redis
 :project-version: 2.2.2
