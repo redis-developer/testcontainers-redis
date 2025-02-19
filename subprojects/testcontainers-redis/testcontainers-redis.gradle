@@ -4,3 +4,9 @@ dependencies {
     testImplementation group: 'com.redis', name: 'lettucemod', version: lettucemodVersion 
     testImplementation project(':testcontainers-redis-test')
 }
+
+eclipse {
+    project {
+        name = 'testcontainers-redis-core'
+    }
+}
