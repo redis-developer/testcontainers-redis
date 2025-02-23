@@ -68,6 +68,7 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
+
 }
 
 subprojects {
@@ -81,7 +82,11 @@ subprojects {
             }
         }
     }
-    
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    }
+
     license {
         exclude('build/**')
     }
